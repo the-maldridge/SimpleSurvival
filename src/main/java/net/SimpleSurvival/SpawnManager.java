@@ -8,5 +8,9 @@ import java.util.ArrayList;
  * Created by maldridge on 10/21/14.
  */
 public class SpawnManager {
-	ArrayList<Location> spawnPointList = new ArrayList<Location>();
+	private ArrayList<Location> spawnPointList = new ArrayList<Location>();
+
+	ArrayList<Location> getSpawnList() {
+		return spawnPointList;
+	}
 }
