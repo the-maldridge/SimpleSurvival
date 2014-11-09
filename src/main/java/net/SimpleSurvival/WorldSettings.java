@@ -1,6 +1,7 @@
 package net.SimpleSurvival;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,9 +22,9 @@ public class WorldSettings {
 	/**
 	 * Hash of loot with item name as key and frequency as the value.
 	 */
-	public HashMap<String, Double> loot;
+	public HashMap<Material, Double> loot;
 	/**
 	 * List of breakable blocks.
 	 */
-	public ArrayList<String> breakables;
+	public ArrayList<Material> breakables;
 }
