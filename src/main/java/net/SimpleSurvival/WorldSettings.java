@@ -19,7 +19,7 @@ public class WorldSettings {
 	/**
 	 * List of spawn points.
 	 */
-	public int[][] spawns;
+	public ArrayList<Integer []> spawns;
 	/**
 	 * Hash of loot with item name as key and frequency as the value.
 	 */

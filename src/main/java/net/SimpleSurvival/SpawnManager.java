@@ -12,9 +12,9 @@ import java.util.ArrayList;
 public class SpawnManager {
     public boolean sendPlayersToSpawn(GameSettings currentGame) {
         for (int i = 0; i < currentGame.competitors.size(); i++) {
-            int x = currentGame.spawns[i][1];
-            int y = currentGame.spawns[i][2];
-            int z = currentGame.spawns[i][3];
+            int x = currentGame.spawns.get(i)[0];
+            int y = currentGame.spawns.get(i)[1];
+            int z = currentGame.spawns.get(i)[2];
             World w = Bukkit.getWorld(currentGame.gameWorld);
             Location nextSpawn = new Location(w, x, y, z);
             Bukkit.getPlayer(currentGame.competitors.get(i)).teleport(nextSpawn);
