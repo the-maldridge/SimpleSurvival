@@ -46,7 +46,13 @@ public class SimpleSurvival extends JavaPlugin {
 			}
 
 			if(worldSettings.containsKey(worldName)) {
-				return spawnManager.setSpawn(worldSettings.get(worldName), spawnNum, player.getLocation());
+				WorldSettings settings = worldSettings.get(worldName);
+				if(spawnNum < settings.spawns.size()) {
+					return spawnManager.setSpawn(settings, spawnNum, player.getLocation());
+				} else {
+					player.sendMessage("Not enough spawn points already exist.");
+					return true;
+				}
 			} else {
 				player.sendMessage("World settings do not exist.");
 				return true;
