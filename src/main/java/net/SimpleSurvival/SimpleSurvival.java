@@ -87,9 +87,9 @@ public class SimpleSurvival extends JavaPlugin {
 			int i = 1;
 			for(Integer[] spawn : settings.spawns) {
 				player.sendMessage("Spawn " + i++ + ":");
-				player.sendMessage("\tx:\t" + spawn[0]);
-				player.sendMessage("\ty:\t" + spawn[1]);
-				player.sendMessage("\tz:\t" + spawn[2]);
+				player.sendMessage("   x: " + spawn[0]);
+				player.sendMessage("   y: " + spawn[1]);
+				player.sendMessage("   z: " + spawn[2]);
 			}
 			return true;
 		}
