@@ -87,7 +87,7 @@ public class WorldManager {
             OutputStream out = new FileOutputStream(target);
             byte[] buffer = new byte[1024];
             int length;
-//copy the file content in bytes
+            //copy the file content in bytes
             while((length = in.read(buffer)) > 0)
                 out.write(buffer, 0, length);
             in.close();
