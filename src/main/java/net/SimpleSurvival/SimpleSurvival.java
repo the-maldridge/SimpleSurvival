@@ -33,7 +33,7 @@ public class SimpleSurvival extends JavaPlugin {
 			String cmdName = cmd.getName();
 			if(cmdName.equalsIgnoreCase("addSpawn")) {
 				return addSpawn((Player)sender);
-			} else if(cmdName.equalsIgnoreCase("setSpawn")) {
+			} else if(cmdName.equalsIgnoreCase("changeSpawn")) {
 				return setSpawn((Player)sender, args[0]);
 			}
 			return false;
