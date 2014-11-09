@@ -54,6 +54,7 @@ public class SimpleSurvival extends JavaPlugin {
 			int spawnNum;
 			try {
 				spawnNum = Integer.valueOf(arg);
+				--spawnNum;
 			} catch(NumberFormatException e) {
 				return false;
 			}
@@ -64,7 +65,7 @@ public class SimpleSurvival extends JavaPlugin {
 					boolean returnValue;
 					returnValue = spawnManager.setSpawn(settings, spawnNum, player.getLocation());
 					if(returnValue == true) {
-						player.sendMessage("Spawn " + spawnNum + " successfully changed.");
+						player.sendMessage("Spawn " + (spawnNum + 1) + " successfully changed.");
 					}
 					return returnValue;
 				} else {
