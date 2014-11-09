@@ -12,11 +12,11 @@ permissions:
     description: Allows you to manage spawn points.
 
 commands:
-  addspawn:
+  changespawn:
     description: Add the designated spawn point
     usage: "Usage: /<command> [spawnNum]"
     permission: gamemaster
-  addnextspawn:
+  addspawn:
     description: Add the next spawn point
     usage: "Usage: /<command>"
     permission: gamemaster
