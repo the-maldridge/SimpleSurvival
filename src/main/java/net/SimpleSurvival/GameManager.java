@@ -1,19 +1,18 @@
 package net.SimpleSurvival;
 
+import org.bukkit.entity.Player;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.plugin.java.JavaPlugin;
-
 import java.util.ArrayList;
+
 
 /**
  * Created by maldridge on 10/21/14.
@@ -46,8 +45,8 @@ public class GameManager {
 
             spectators.add(killers.remove(killers.indexOf(killer.getName())));
             setSpectatorMode();
-            for(Player p: player.getWorld().getPlayers()) {
-                p.sendMessage(ChatColor.RED + "[DEATH]" + ChatColor.BOLD + player.getName() + " was killed by " + ChatColor.BOLD + killer.getName());
+            for(Player pl: player.getWorld().getPlayers()) {
+                pl.sendMessage(ChatColor.RED + "[DEATH]" + ChatColor.BOLD + player.getName() + " was killed by " + ChatColor.BOLD + killer.getName());
             }
         }
     }
