@@ -44,7 +44,13 @@ public class SimpleSurvival extends JavaPlugin {
 			} catch(NumberFormatException e) {
 				return false;
 			}
-			return spawnManager.setSpawn(worldSettings.get(worldName), spawnNum, player.getLocation());
+
+			if(worldSettings.containsKey(worldName)) {
+				return spawnManager.setSpawn(worldSettings.get(worldName), spawnNum, player.getLocation());
+			} else {
+				player.sendMessage("World settings do not exist.");
+				return true;
+			}
 		}
 	}
 }
