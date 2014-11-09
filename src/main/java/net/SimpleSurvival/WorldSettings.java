@@ -28,4 +28,14 @@ public class WorldSettings {
 	 * List of breakable blocks.
 	 */
 	public ArrayList<Material> breakables;
+
+	public WorldSettings() {
+		minPlayers = 4;
+		maxPlayers = 8;
+		spawns = new ArrayList<Integer []>();
+		loot = new HashMap<Material, Double>();
+		breakables = new ArrayList<Material>();
+
+		loot.put(Material.STICK, 1.00);
+	}
 }
