@@ -41,7 +41,12 @@ public class SimpleSurvival extends JavaPlugin {
 
 		private boolean addSpawn(Player player) {
 			String worldName = player.getLocation().getWorld().getName();
-			return spawnManager.addSpawn(worldSettings.get(worldName), player.getLocation());
+			boolean returnValue;
+			returnValue = spawnManager.addSpawn(worldSettings.get(worldName), player.getLocation());
+			if(returnValue == true) {
+				player.sendMessage("Successfully added spawn.");
+			}
+			return returnValue;
 		}
 
 		private boolean setSpawn(Player player, String arg) {
@@ -56,7 +61,12 @@ public class SimpleSurvival extends JavaPlugin {
 			if(worldSettings.containsKey(worldName)) {
 				WorldSettings settings = worldSettings.get(worldName);
 				if(spawnNum < settings.spawns.size()) {
-					return spawnManager.setSpawn(settings, spawnNum, player.getLocation());
+					boolean returnValue;
+					returnValue = spawnManager.setSpawn(settings, spawnNum, player.getLocation());
+					if(returnValue == true) {
+						player.sendMessage("Spawn " + spawnNum + " successfully changed.");
+					}
+					return returnValue;
 				} else {
 					player.sendMessage("Not enough spawn points already exist.");
 					return true;
