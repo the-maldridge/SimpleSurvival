@@ -21,4 +21,26 @@ public class SpawnManager {
         }
         return true;
     }
+
+	public boolean addSpawn(WorldSettings currentWorld, Location loc) {
+		Integer[] currentLoc = new Integer[3];
+		currentLoc[0] = (int)loc.getX();
+		currentLoc[1] = (int)loc.getY();
+		currentLoc[2] = (int)loc.getZ();
+
+		currentWorld.spawns.add(currentLoc);
+
+		return true;
+	}
+
+	public boolean setSpawn(WorldSettings currentWorld, int index, Location loc) {
+		Integer[] currentLoc = new Integer[3];
+		currentLoc[0] = (int)loc.getX();
+		currentLoc[1] = (int)loc.getY();
+		currentLoc[2] = (int)loc.getZ();
+
+		currentWorld.spawns.set(index, currentLoc);
+
+		return true;
+	}
 }
