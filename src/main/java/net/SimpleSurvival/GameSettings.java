@@ -31,7 +31,7 @@ public class GameSettings extends WorldSettings {
     /*
     Game state, gives an indication of where the game is
      */
-    private enum GameState {PRESTART, RUNNING, PAUSED, FINISH}
+    public enum GameState {PRESTART, RUNNING, PAUSED, FINISH}
     public GameState state;
 
 }
