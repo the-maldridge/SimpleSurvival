@@ -11,8 +11,14 @@ import java.util.HashMap;
  * Created by maldridge on 11/8/14.
  */
 public class SimpleSurvival extends JavaPlugin {
+	CommandParser commandParser = new CommandParser();
 	SpawnManager spawnManager = new SpawnManager();
 	HashMap<String, WorldSettings> worldSettings = new HashMap<String, WorldSettings>();
+
+	@Override
+	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+		return commandParser.parseCommand(sender, cmd, label, args);
+	}
 
 	private class CommandParser {
 		public boolean parseCommand(CommandSender sender, Command cmd, String label, String[] args) {
