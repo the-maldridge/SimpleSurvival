@@ -28,4 +28,10 @@ public class GameSettings extends WorldSettings {
     Game Time, default is 15 minutes
      */
     public int timeLimit = 15;
+    /*
+    Game state, gives an indication of where the game is
+     */
+    private enum GameState {PRESTART, RUNNING, PAUSED, FINISH}
+    public GameState state;
+
 }

@@ -3,6 +3,7 @@ package net.SimpleSurvival;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -18,7 +19,7 @@ public class WorldSettings {
 	/**
 	 * List of spawn points.
 	 */
-	public ArrayList<Location> spawns;
+	public int[][] spawns;
 	/**
 	 * Hash of loot with item name as key and frequency as the value.
 	 */
