@@ -1,3 +1,22 @@
 name: SimpleSurvival
 main: net.SimpleSurvival.SimpleSurvival
 version: 0.1-SNAPSHOT
+
+permissions:
+  gamemaster.*:
+    description: The admin of the survival game.
+    default: op
+    children:
+      gamemaster.spawn: true
+  gamemaster.spawn:
+    description: Allows you to manage spawn points.
+
+commands:
+  addspawn:
+    description: Add the designated spawn point
+    usage: "Usage: /<command> [spawnNum]"
+    permission: gamemaster
+  addnextspawn:
+    description: Add the next spawn point
+    usage: "Usage: /<command>"
+    permission: gamemaster
