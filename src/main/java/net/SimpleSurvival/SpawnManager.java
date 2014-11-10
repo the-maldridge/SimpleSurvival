@@ -1,10 +1,10 @@
 package net.SimpleSurvival;
 
+import net.SimpleSurvival.settings.GameSettings;
+import net.SimpleSurvival.settings.WorldSettings;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.Location;
-import java.util.ArrayList;
 
 /**
  * Created by maldridge on 10/21/14.

@@ -1,11 +1,11 @@
 package net.SimpleSurvival;
 
+import net.SimpleSurvival.settings.WorldSettings;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.entity.Player;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.World;
-import org.bukkit.Server;
 
 import java.util.HashMap;
 
@@ -34,7 +34,10 @@ public class SimpleSurvival extends JavaPlugin {
 			if(cmdName.equalsIgnoreCase("addSpawn")) {
 				return addSpawn((Player)sender);
 			} else if(cmdName.equalsIgnoreCase("changeSpawn")) {
+				if (args.length != 1) return false;
 				return setSpawn((Player)sender, args[0]);
+			} else if(cmdName.equalsIgnoreCase("getSpawns")) {
+				return getSpawns((Player)sender);
 			}
 			return false;
 		}
@@ -76,6 +79,19 @@ public class SimpleSurvival extends JavaPlugin {
 				player.sendMessage("World settings do not exist.");
 				return true;
 			}
+		}
+
+		private boolean getSpawns(Player player) {
+			String worldName = player.getLocation().getWorld().getName();
+			WorldSettings settings = worldSettings.get(worldName);
+			int i = 1;
+			for(Integer[] spawn : settings.spawns) {
+				player.sendMessage("Spawn " + i++ + ":");
+				player.sendMessage("   x: " + spawn[0]);
+				player.sendMessage("   y: " + spawn[1]);
+				player.sendMessage("   z: " + spawn[2]);
+			}
+			return true;
 		}
 	}
 }

@@ -25,7 +25,7 @@ public class WorldManager {
             this.plugin.getLogger().severe("Could not load world " + template);
         }
 
-        
+
     }
 
 

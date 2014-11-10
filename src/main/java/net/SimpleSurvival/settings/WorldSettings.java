@@ -1,4 +1,4 @@
-package net.SimpleSurvival;
+package net.SimpleSurvival.settings;
 
 import org.bukkit.Location;
 import org.bukkit.Material;

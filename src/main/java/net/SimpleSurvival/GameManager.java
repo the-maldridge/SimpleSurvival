@@ -1,5 +1,6 @@
 package net.SimpleSurvival;
 
+import net.SimpleSurvival.settings.GameSettings;
 import org.bukkit.entity.Player;
 
 import org.bukkit.Bukkit;

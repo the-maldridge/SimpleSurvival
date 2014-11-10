@@ -1,9 +1,6 @@
-package net.SimpleSurvival;
-
-import org.bukkit.World;
+package net.SimpleSurvival.settings;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by maldridge on 11/8/14.
