@@ -20,6 +20,7 @@ commands:
     description: Add the next spawn point
     usage: "Usage: /<command>"
     permission: gamemaster
-  getspawns:
-    description: Get all spawn points
-    usage: "Usage: /<command>"
+  survival:
+    description: register or unregister from a game
+    usage: "Usage: /survival <register|unregister> <gameID>"
+    permission: gamemaster

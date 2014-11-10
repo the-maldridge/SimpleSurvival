@@ -1,0 +1,7 @@
+worlds:
+    bar:
+        minPlayers: 1
+        maxPlayers: 4
+        spawns:
+            0,127,0
+

@@ -9,8 +9,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.entity.Player;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.World;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitScheduler;
 
 import java.util.ArrayList;
@@ -31,6 +29,9 @@ public class SimpleSurvival extends JavaPlugin {
 	HashMap<String, GameTemplate> gameTemplates = new HashMap<String, GameTemplate>();
     ArrayList<GameSettings> runningGames = new ArrayList<>();
 
+    public SimpleSurvival() {
+        gameTemplates.put("bar", new GameTemplate(this, "bar", "bar"));
+    }
 
 	@EventHandler
 	public void onPlayerQuit(PlayerQuitEvent evt) {
@@ -44,11 +45,22 @@ public class SimpleSurvival extends JavaPlugin {
 		}
 	}
 
-    @EventHandler
     public void onEnable() {
+        //this.saveDefaultConfig();
         BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-        this.getLogger().severe(""+scheduler.scheduleSyncRepeatingTask(this, new checkQueue(this), 0L, 20L));
+        scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
+            SimpleSurvival plugin = SimpleSurvival.this;
+            @Override
+            public void run() {
+                for (GameTemplate game : this.plugin.gameTemplates.values()) {
+                    if (game.isReady()) {
+                        this.plugin.runningGames.add(game.createSettings());
+                    }
+                }
+            }
+        }, 0L, 200L);
     }
+
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
@@ -69,15 +81,15 @@ public class SimpleSurvival extends JavaPlugin {
 
 			boolean isRegistering;
 
-			if(args[1].equalsIgnoreCase("register")) {
+			if(args[0].equalsIgnoreCase("register")) {
 				isRegistering = true;
-			} else if(args[1].equalsIgnoreCase("unregister")) {
+			} else if(args[0].equalsIgnoreCase("unregister")) {
 				isRegistering = false;
 			} else {
 				return false;
 			}
 
-			String gameName = args[2];
+			String gameName = args[1];
 
 			if (!gameTemplates.containsKey(gameName)) {
 				sender.sendMessage("Could not find the game " + gameName);
@@ -165,22 +177,4 @@ public class SimpleSurvival extends JavaPlugin {
 			return true;
 		}
 	}
-}
-
-class checkQueue extends BukkitRunnable {
-    private SimpleSurvival plugin;
-
-    public checkQueue(SimpleSurvival plugin) {
-        this.plugin = plugin;
-    }
-    @Override
-    public void run() {
-        for (GameTemplate game : this.plugin.gameTemplates.values()) {
-            if (game.isReady()) {
-                this.plugin.runningGames.add(game.createSettings());
-                this.plugin.getLogger().severe("hit this");
-                System.exit(1);
-            }
-        }
-    }
 }

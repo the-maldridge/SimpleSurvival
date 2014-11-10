@@ -1,13 +1,12 @@
 package net.SimpleSurvival.settings;
 
 import net.SimpleSurvival.SimpleSurvival;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by Reid Levenick on 11/9/14.
@@ -53,16 +52,15 @@ public class GameTemplate {
         this.sourceWorld = sourceWorld;
         this.displayName = displayName;
         this.minPlayers = plugin.getConfig().getInt("worlds." + sourceWorld + ".minPlayers");
-        this.maxPlayers = plugin.getConfig().getInt("worlds." + sourceWorld + ".minPlayers");
+        this.maxPlayers = plugin.getConfig().getInt("worlds." + sourceWorld + ".maxPlayers");
 
         this.spawns = (List<List<Integer>>) plugin.getConfig().getList("worlds."+sourceWorld+".spawns");
 
-        HashMap<String, Double> lootNames = new HashMap<>();
-        plugin.getConfig().createSection("worlds." + sourceWorld + ".loot", lootNames);
+        /*Map<String, Object> lootNames = (Map<String, Object>)plugin.getConfig().getConfigurationSection("worlds." + sourceWorld + ".loot").getValues(false);
         this.loot = new HashMap<>();
         for(String key: lootNames.keySet()) {
-            this.loot.put(Material.getMaterial(key), lootNames.get(key));
-        }
+            this.loot.put(Material.getMaterial(key), (Double)lootNames.get(key));
+        }*/
 
         List<String> breakableNames = plugin.getConfig().getStringList("worlds." + sourceWorld + ".breakables");
         this.breakables = new ArrayList<Material>();
@@ -93,6 +91,9 @@ public class GameTemplate {
     public GameSettings createSettings() {
         // Spins off a new GameSettings from GameTemplate to represent a running game
         GameSettings val = new GameSettings(competitors, this);
+        for(String p: competitors) {
+            Bukkit.getPlayer(p).sendMessage("The game is about to begin");
+        }
         this.competitors = new ArrayList<>();
         return val;
     }
