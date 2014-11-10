@@ -1,6 +1,8 @@
 package net.SimpleSurvival.settings;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Created by maldridge on 11/8/14.
@@ -9,26 +11,46 @@ public class GameSettings extends WorldSettings {
     /*
     Which world the game originates in
     */
-    public String gameWorld;
+    private String world;
+    public String getWorld() {
+        return world;
+    }
 
     /*
     which world should be displayed as the game world
      */
-    public String gameWorldTitle;
+    private String title;
+    public String getTitle() {
+        return title;
+    }
 
     /*
     Players competing
      */
-    public ArrayList<String> competitors = new ArrayList<String>();
+    private ArrayList<String> competitors = new ArrayList<String>();
+    public void addCompetitor(String competitor) {
+        competitors.add(competitor);
+        Collections.sort(competitors);
+    }
+    public boolean hasCompetitor(String competitor) {
+        return Collections.binarySearch(competitors, competitor) >= 0;
+    }
+    public void removeCompetitor(String competitor) {
+        competitors.remove(competitor);
+    }
+    public List<String> getCompetitors() {
+        return (List<String>)Collections.unmodifiableList(competitors);
+    }
 
-    /*
-    Game Time, default is 15 minutes
-     */
-    public int timeLimit = 15;
     /*
     Game state, gives an indication of where the game is
      */
     public enum GameState {PRESTART, RUNNING, PAUSED, FINISH}
-    public GameState state;
-
+    private GameState state;
+    public GameState getState() {
+        return state;
+    }
+    public void setState(GameState state) {
+        this.state = state;
+    }
 }
