@@ -37,4 +37,6 @@ public class GameSettings {
     public GameState getState() {
         return state;
     }
+
+
 }

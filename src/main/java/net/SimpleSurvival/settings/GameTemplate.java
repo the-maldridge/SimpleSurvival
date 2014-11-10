@@ -14,13 +14,29 @@ import java.util.List;
 public class GameTemplate {
     private final int minPlayers;
     private final int maxPlayers;
+
+    public List<List<Integer>> getSpawns() {
+        return spawns;
+    }
+
+    public HashMap<Material, Double> getLoot() {
+        return loot;
+    }
+
+    public List<Material> getBreakables() {
+        return breakables;
+    }
+
     private final List<List<Integer>> spawns;
     private final HashMap<Material, Double> loot;
     private final List<Material> breakables;
+
     // The people 'lined up' for this game
     private ArrayList<String> competitors = new ArrayList<>();
+
     // The name of the 'backup' world that this world is going to be initialized from
     private String sourceWorld;
+
     // The display name of this template, e.g. 'castles' or somesuch
     private String displayName;
 
