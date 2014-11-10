@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.World;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitScheduler;
 
 import java.util.ArrayList;
@@ -26,6 +27,7 @@ public class SimpleSurvival extends JavaPlugin {
 	// Map of games on particular worlds; Contains information about running/waiting games
 	// TODO: Save game settings and load them in a useful manner
 	// TODO: Remove players from the list of competitors when they disconnect
+    // The keys of this hashmap are the source names
 	HashMap<String, GameTemplate> gameTemplates = new HashMap<String, GameTemplate>();
     ArrayList<GameSettings> runningGames = new ArrayList<>();
 
@@ -42,18 +44,10 @@ public class SimpleSurvival extends JavaPlugin {
 		}
 	}
 
+    @EventHandler
     public void onEnable() {
         BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-        scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
-            @Override
-            public void run() {
-                for(GameTemplate game: gameTemplates.values()) {
-                    if(game.isReady()) {
-                            runningGames.add(game.createSettings());
-                    }
-                }
-            }
-        }, 0L, 200L);
+        this.getLogger().severe(""+scheduler.scheduleSyncRepeatingTask(this, new checkQueue(this), 0L, 20L));
     }
 
 	@Override
@@ -63,16 +57,13 @@ public class SimpleSurvival extends JavaPlugin {
 			// Add the player to the list for the game they are attempting to enter
 			if (!(sender instanceof Player)) {
 				sender.sendMessage("It is assumed that only Players may register for a game");
-				return false;
+				return true;
 			}
 
 			String player = ((Player) sender).getName();
 
 			// NOTE: Assumes that games do not have a space in the name
 			if (args.length != 2) {
-				sender.sendMessage("Game un/registration takes two arguments, in the form");
-				sender.sendMessage("  register <name>");
-				sender.sendMessage("unregister <name>");
 				return false;
 			}
 
@@ -83,7 +74,6 @@ public class SimpleSurvival extends JavaPlugin {
 			} else if(args[1].equalsIgnoreCase("unregister")) {
 				isRegistering = false;
 			} else {
-				sender.sendMessage("Game registration takes 'register' or 'unregister' as the first argument");
 				return false;
 			}
 
@@ -91,7 +81,7 @@ public class SimpleSurvival extends JavaPlugin {
 
 			if (!gameTemplates.containsKey(gameName)) {
 				sender.sendMessage("Could not find the game " + gameName);
-				return false;
+				return true;
 			}
 
 			GameTemplate game = gameTemplates.get(gameName);
@@ -99,15 +89,20 @@ public class SimpleSurvival extends JavaPlugin {
 			if(isRegistering) {
 				if (game.hasCompetitor(player)) {
 					sender.sendMessage("You are already registered for that game");
-					return false;
+					return true;
 				}
 
 				for (String key : gameTemplates.keySet()) {
 					if (gameTemplates.get(key).hasCompetitor(player)) {
 						sender.sendMessage("You are already in the game " + key);
-						return false;
+						return true;
 					}
 				}
+
+                if(game.isFull()) {
+                    sender.sendMessage("That game is full");
+                    return true;
+                }
 
 				// Finally, there are no problems, so we can add the player to the list
 				game.addCompetitor(player);
@@ -116,7 +111,7 @@ public class SimpleSurvival extends JavaPlugin {
 			} else {
 				if (!game.hasCompetitor(player)) {
 					sender.sendMessage("You aren't registered for that game");
-					return false;
+					return true;
 				}
 
 				game.removeCompetitor(player);
@@ -130,16 +125,13 @@ public class SimpleSurvival extends JavaPlugin {
 			// TODO: Add permission check
 			if (args.length != 1) return false;
 			return setSpawn((Player)sender, args[0]);
-		} else if(cmdName.equalsIgnoreCase("getSpawns")) {
-			// TODO: Add permission check
-			return getSpawns((Player)sender);
 		}
 		return false;
 	}
 
 	private boolean addSpawn(Player player) {
 		String worldName = player.getLocation().getWorld().getName();
-		boolean success = spawnManager.addSpawn(worldSettings.get(worldName), player.getLocation());
+		boolean success = gameTemplates.get(worldName).addSpawn(player.getLocation());
 		if(success) {
 			player.sendMessage("Successfully added spawn.");
 		}
@@ -156,10 +148,10 @@ public class SimpleSurvival extends JavaPlugin {
 			return false;
 		}
 
-		if(worldSettings.containsKey(worldName)) {
-			WorldSettings settings = worldSettings.get(worldName);
-			if(spawnNum < settings.spawns.size()) {
-				boolean success = spawnManager.setSpawn(settings, spawnNum, player.getLocation());
+		if(gameTemplates.containsKey(worldName)) {
+			GameTemplate game = gameTemplates.get(worldName);
+			if(spawnNum < game.getSpawns().size()) {
+				boolean success = game.setSpawn(spawnNum, player.getLocation());
 				if(success) {
 					player.sendMessage("Spawn " + (spawnNum + 1) + " successfully changed.");
 				}
@@ -173,17 +165,22 @@ public class SimpleSurvival extends JavaPlugin {
 			return true;
 		}
 	}
+}
 
-	private boolean getSpawns(Player player) {
-		String worldName = player.getLocation().getWorld().getName();
-		WorldSettings settings = worldSettings.get(worldName);
-		int i = 1;
-		for(Integer[] spawn : settings.spawns) {
-			player.sendMessage("Spawn " + i++ + ":");
-			player.sendMessage("   x: " + spawn[0]);
-			player.sendMessage("   y: " + spawn[1]);
-			player.sendMessage("   z: " + spawn[2]);
-		}
-		return true;
-	}
+class checkQueue extends BukkitRunnable {
+    private SimpleSurvival plugin;
+
+    public checkQueue(SimpleSurvival plugin) {
+        this.plugin = plugin;
+    }
+    @Override
+    public void run() {
+        for (GameTemplate game : this.plugin.gameTemplates.values()) {
+            if (game.isReady()) {
+                this.plugin.runningGames.add(game.createSettings());
+                this.plugin.getLogger().severe("hit this");
+                System.exit(1);
+            }
+        }
+    }
 }

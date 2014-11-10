@@ -24,8 +24,6 @@ public class WorldManager {
         } catch(IOException e) {
             this.plugin.getLogger().severe("Could not load world " + template);
         }
-
-
     }
 
 
