@@ -1,7 +1,8 @@
 worlds:
-    bar:
+    BreezeIsland:
         minPlayers: 1
         maxPlayers: 4
         spawns:
-            0,127,0
-
+          - 0,127,0
+        loot:
+            STONE_SWORD: 100

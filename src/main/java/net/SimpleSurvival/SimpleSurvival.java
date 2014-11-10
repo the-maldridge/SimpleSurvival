@@ -3,6 +3,7 @@ package net.SimpleSurvival;
 import net.SimpleSurvival.settings.GameSettings;
 import net.SimpleSurvival.settings.GameTemplate;
 import org.bukkit.Bukkit;
+import org.bukkit.WorldCreator;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -27,10 +28,15 @@ public class SimpleSurvival extends JavaPlugin {
 	// TODO: Remove players from the list of competitors when they disconnect
     // The keys of this hashmap are the source names
 	HashMap<String, GameTemplate> gameTemplates = new HashMap<String, GameTemplate>();
-    ArrayList<GameSettings> runningGames = new ArrayList<>();
+    ArrayList<GameManager> runningGames = new ArrayList<>();
+    WorldManager worldManager = new WorldManager(this);
 
     public SimpleSurvival() {
-        gameTemplates.put("bar", new GameTemplate(this, "bar", "bar"));
+        String[] worlds = this.getDataFolder().list();
+        for(String world: worlds) {
+            this.getLogger().info("Found template world " + world);
+            gameTemplates.put(world, new GameTemplate(this, world, world));
+        }
     }
 
 	@EventHandler
@@ -54,7 +60,16 @@ public class SimpleSurvival extends JavaPlugin {
             public void run() {
                 for (GameTemplate game : this.plugin.gameTemplates.values()) {
                     if (game.isReady()) {
-                        this.plugin.runningGames.add(game.createSettings());
+                        // FIXME: Btw I changed this maldridge, look at it because I'm going to forget
+                        // Get the settings for the world
+                        GameSettings settings = game.createSettings();
+                        // Copy the world data into the running worlds
+                        this.plugin.worldManager.newWorldFromTemplate(settings.getWorld(), settings.getWorldUUID());
+                        // Load the world into memory
+                        this.plugin.getServer().createWorld(new WorldCreator(settings.getWorldUUID()));
+                        // Add the world to the running games
+                        System.out.println("world loaded, about to start");
+                        this.plugin.runningGames.add(new GameManager(settings));
                     }
                 }
             }

@@ -2,10 +2,7 @@ package net.SimpleSurvival.settings;
 
 import org.bukkit.Material;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by maldridge on 11/8/14.
@@ -15,11 +12,17 @@ public class GameSettings {
     // and the fancy display name if oyu're into that kind of thing
     private GameTemplate staticSettings;
 
-    public String getRunningWorld() {
-        return runningWorld;
+    public String getWorld() {
+        return world;
+    }
+    public String getWorldUUID() {
+        return worldUUID;
     }
 
-    private String runningWorld;
+    // The backend data/settings world name
+    private String world;
+    // The running copy world name
+    private String worldUUID = UUID.randomUUID().toString();
 
     public ArrayList<String> getCompetitors() {
         return competitors;
@@ -33,7 +36,7 @@ public class GameSettings {
     /*
     Players competing
      */
-    private ArrayList<String> competitors = new ArrayList<String>();
+    private ArrayList<String> competitors;
 
     /*
     Game state, gives an indication of where the game is
@@ -42,7 +45,7 @@ public class GameSettings {
         RUNNING, PAUSED, FINISH
     }
 
-    public List<List<Integer>> getSpawns() {
+    public List<Integer[]> getSpawns() {
         return this.staticSettings.getSpawns();
     }
 

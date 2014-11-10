@@ -20,9 +20,11 @@ public class GameManager implements Listener {
     GameSettings currentGame;
     ArrayList<String> spectators = new ArrayList<String>();
 
-
     public GameManager(GameSettings currentGame) {
         this.currentGame = currentGame;
+        System.out.println("players passed to us " + currentGame.getCompetitors().toString());
+        sendPlayersToSpawn();
+
     }
 
     public void gameStateFreeze(PlayerMoveEvent p) {
@@ -71,12 +73,14 @@ public class GameManager implements Listener {
     }
 
     public boolean sendPlayersToSpawn() {
+        System.out.println(currentGame.getCompetitors().size());
         for (int i = 0; i < currentGame.getCompetitors().size(); i++) {
-            int x = currentGame.getSpawns().get(i).get(0);
-            int y = currentGame.getSpawns().get(i).get(1);
-            int z = currentGame.getSpawns().get(i).get(2);
-            World w = Bukkit.getWorld(currentGame.getRunningWorld());
+            int x = currentGame.getSpawns().get(i)[0];
+            int y = currentGame.getSpawns().get(i)[1];
+            int z = currentGame.getSpawns().get(i)[2];
+            World w = Bukkit.getWorld(currentGame.getWorldUUID());
             Location nextSpawn = new Location(w, x, y, z);
+            System.out.println("Teleporting " + currentGame.getCompetitors().get(i));
             Bukkit.getPlayer(currentGame.getCompetitors().get(i)).teleport(nextSpawn);
         }
         return true;

@@ -23,7 +23,7 @@ public class GameTemplate {
         return competitors.size()>=maxPlayers;
     }
 
-    public List<List<Integer>> getSpawns() {
+    public List<Integer[]> getSpawns() {
         return spawns;
     }
 
@@ -35,7 +35,7 @@ public class GameTemplate {
         return breakables;
     }
 
-    private  List<List<Integer>> spawns;
+    private  List<Integer[]> spawns;
     private  HashMap<Material, Double> loot;
     private  List<Material> breakables;
 
@@ -54,13 +54,23 @@ public class GameTemplate {
         this.minPlayers = plugin.getConfig().getInt("worlds." + sourceWorld + ".minPlayers");
         this.maxPlayers = plugin.getConfig().getInt("worlds." + sourceWorld + ".maxPlayers");
 
-        this.spawns = (List<List<Integer>>) plugin.getConfig().getList("worlds."+sourceWorld+".spawns");
+        List<String> spawns = plugin.getConfig().getStringList("worlds." + sourceWorld + ".spawns");
+        this.spawns = new ArrayList<>();
+        for(String point: spawns) {
+            String[] xyzStr = point.split(",");
+            Integer[] xyz = new Integer[3];
+            for(int i = 0; i < 3; ++i) {
+                System.out.println("Parsing XYZ: " + xyzStr[i].trim());
+                xyz[i] = Integer.parseInt(xyzStr[i].trim());
+            }
+            this.spawns.add(xyz);
+        }
 
-        /*Map<String, Object> lootNames = (Map<String, Object>)plugin.getConfig().getConfigurationSection("worlds." + sourceWorld + ".loot").getValues(false);
+        Map<String, Object> lootNames = (Map<String, Object>)plugin.getConfig().getConfigurationSection("worlds." + sourceWorld + ".loot").getValues(false);
         this.loot = new HashMap<>();
         for(String key: lootNames.keySet()) {
             this.loot.put(Material.getMaterial(key), (Double)lootNames.get(key));
-        }*/
+        }
 
         List<String> breakableNames = plugin.getConfig().getStringList("worlds." + sourceWorld + ".breakables");
         this.breakables = new ArrayList<Material>();
@@ -99,10 +109,10 @@ public class GameTemplate {
     }
     //TODO write back to the disk
     public boolean addSpawn(Location loc) {
-        ArrayList<Integer> currentLoc = new ArrayList<Integer>();
-        currentLoc.add((int)loc.getX());
-        currentLoc.add((int)loc.getY());
-        currentLoc.add((int)loc.getZ());
+        Integer[] currentLoc = new Integer[3];
+        currentLoc[0] = (int)loc.getX();
+        currentLoc[1] = (int)loc.getY();
+        currentLoc[2] = (int)loc.getZ();
 
         spawns.add(currentLoc);
 
@@ -110,10 +120,10 @@ public class GameTemplate {
     }
 
     public boolean setSpawn(int index, Location loc) {
-        ArrayList<Integer> currentLoc = new ArrayList<Integer>();
-        currentLoc.add((int)loc.getX());
-        currentLoc.add((int)loc.getY());
-        currentLoc.add((int)loc.getZ());
+        Integer[] currentLoc = new Integer[3];
+        currentLoc[0] = (int)loc.getX();
+        currentLoc[1] = (int)loc.getY();
+        currentLoc[2] = (int)loc.getZ();
 
         spawns.set(index, currentLoc);
 
