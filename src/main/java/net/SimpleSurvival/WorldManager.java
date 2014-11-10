@@ -20,7 +20,10 @@ public class WorldManager {
     public void newWorldFromTemplate(String template, String newName) {
         boolean errors = false;
         try {
-            Files.walkFileTree(Paths.get(this.plugin.getDataFolder() + template), new CopyFileVisitor(Paths.get(Bukkit.getWorldContainer() + newName)));
+            //TODO figure out why this doesn't actually copy the world
+            // NOTE: it has an IOException after the player is registered into a game and the SimpleSurvival instance attempts to copy the world template over into the worlds directory
+            System.out.println(this.plugin.getDataFolder().getCanonicalPath()+ ":"+ template);
+            Files.walkFileTree(Paths.get(this.plugin.getDataFolder().getCanonicalPath(), template), new CopyFileVisitor(Paths.get(Bukkit.getWorldContainer().getCanonicalPath(), newName)));
         } catch(IOException e) {
             this.plugin.getLogger().severe("Could not load world " + template);
         }

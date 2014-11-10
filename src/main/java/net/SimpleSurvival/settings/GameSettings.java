@@ -13,14 +13,12 @@ public class GameSettings {
     private GameTemplate staticSettings;
 
     public String getWorld() {
-        return world;
+        return staticSettings.getSourceWorld();
     }
     public String getWorldUUID() {
         return worldUUID;
     }
 
-    // The backend data/settings world name
-    private String world;
     // The running copy world name
     private String worldUUID = UUID.randomUUID().toString();
 

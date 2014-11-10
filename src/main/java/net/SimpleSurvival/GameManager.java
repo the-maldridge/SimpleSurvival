@@ -80,7 +80,7 @@ public class GameManager implements Listener {
             int z = currentGame.getSpawns().get(i)[2];
             World w = Bukkit.getWorld(currentGame.getWorldUUID());
             Location nextSpawn = new Location(w, x, y, z);
-            System.out.println("Teleporting " + currentGame.getCompetitors().get(i));
+            System.out.println("Teleporting " + currentGame.getCompetitors().get(i) + " to " + currentGame.getWorldUUID());
             Bukkit.getPlayer(currentGame.getCompetitors().get(i)).teleport(nextSpawn);
         }
         return true;
