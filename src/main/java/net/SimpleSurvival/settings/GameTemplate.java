@@ -38,13 +38,10 @@ public class GameTemplate {
     public void removeCompetitor(String competitor) {
         competitors.remove(competitor);
     }
-    public List<String> getCompetitors() {
-        return (List<String>)Collections.unmodifiableList(competitors);
-    }
 
     public GameSettings createSettings() {
         // Spins off a new GameSettings from GameTemplate to represent a running game
-        GameSettings val = new GameSettings(competitors, sourceWorld);
+        GameSettings val = new GameSettings(competitors, this);
         this.competitors = new ArrayList<>();
         return val;
     }

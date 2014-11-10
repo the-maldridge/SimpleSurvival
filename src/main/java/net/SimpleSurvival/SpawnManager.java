@@ -1,7 +1,6 @@
 package net.SimpleSurvival;
 
 import net.SimpleSurvival.settings.GameSettings;
-import net.SimpleSurvival.settings.WorldSettings;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.Location;

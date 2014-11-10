@@ -1,8 +1,6 @@
 package net.SimpleSurvival;
 
-import net.SimpleSurvival.settings.GameSettings;
 import net.SimpleSurvival.settings.GameTemplate;
-import net.SimpleSurvival.settings.WorldSettings;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;

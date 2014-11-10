@@ -1,56 +1,40 @@
 package net.SimpleSurvival.settings;
 
+import org.bukkit.Material;
+
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 /**
  * Created by maldridge on 11/8/14.
  */
-public class GameSettings extends WorldSettings {
-    /*
-    Which world the game originates in
-    */
-    private String world;
-    public String getWorld() {
-        return world;
-    }
+public class GameSettings {
+    // so we can get things like the loot table and the breakables list and the spawn positions later
+    // and the fancy display name if oyu're into that kind of thing
+    private GameTemplate staticSettings;
 
-    /*
-    which world should be displayed as the game world
-     */
-    private String title;
-    public String getTitle() {
-        return title;
+    public GameSettings(ArrayList<String> competitors, GameTemplate staticSettings) {
+        this.competitors = competitors;
+        this.staticSettings = staticSettings;
     }
 
     /*
     Players competing
      */
     private ArrayList<String> competitors = new ArrayList<String>();
-    public void addCompetitor(String competitor) {
-        competitors.add(competitor);
-        Collections.sort(competitors);
-    }
-    public boolean hasCompetitor(String competitor) {
-        return Collections.binarySearch(competitors, competitor) >= 0;
-    }
-    public void removeCompetitor(String competitor) {
-        competitors.remove(competitor);
-    }
-    public List<String> getCompetitors() {
-        return (List<String>)Collections.unmodifiableList(competitors);
-    }
 
     /*
     Game state, gives an indication of where the game is
      */
-    public enum GameState {PRESTART, RUNNING, PAUSED, FINISH}
+    public enum GameState {
+        RUNNING, PAUSED, FINISH
+    }
+
     private GameState state;
+
     public GameState getState() {
         return state;
-    }
-    public void setState(GameState state) {
-        this.state = state;
     }
 }

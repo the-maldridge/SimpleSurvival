@@ -26,13 +26,13 @@ public class GameManager {
 
     public GameManager(GameSettings currentGame) {
         this.currentGame = currentGame;
-        this.killers = new ArrayList<String>(currentGame.competitors);
+        this.killers = new ArrayList<String>(currentGame.getCompetitors());
     }
 
     public void gameStateFreeze(PlayerMoveEvent p) {
         if((p != null) && (p instanceof Player)) {
-            if (currentGame.competitors.contains(((Player) p).getName())) {
-                if (currentGame.state == GameSettings.GameState.PRESTART || currentGame.state == GameSettings.GameState.PAUSED) {
+            if (currentGame.getCompetitors().contains(((Player) p).getName())) {
+                if (currentGame.getState() == GameSettings.GameState.PAUSED) {
                     p.setCancelled(true);
                 }
             }
