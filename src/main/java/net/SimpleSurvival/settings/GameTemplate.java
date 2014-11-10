@@ -1,6 +1,7 @@
 package net.SimpleSurvival.settings;
 
 import net.SimpleSurvival.SimpleSurvival;
+import org.bukkit.Location;
 import org.bukkit.Material;
 
 import java.util.ArrayList;
@@ -15,6 +16,14 @@ public class GameTemplate {
     private final int minPlayers;
     private final int maxPlayers;
 
+    public boolean isReady() {
+        return competitors.size()>=minPlayers;
+    }
+
+    public boolean isFull() {
+        return competitors.size()>=maxPlayers;
+    }
+
     public List<List<Integer>> getSpawns() {
         return spawns;
     }
@@ -27,9 +36,9 @@ public class GameTemplate {
         return breakables;
     }
 
-    private final List<List<Integer>> spawns;
-    private final HashMap<Material, Double> loot;
-    private final List<Material> breakables;
+    private  List<List<Integer>> spawns;
+    private  HashMap<Material, Double> loot;
+    private  List<Material> breakables;
 
     // The people 'lined up' for this game
     private ArrayList<String> competitors = new ArrayList<>();
@@ -87,4 +96,27 @@ public class GameTemplate {
         this.competitors = new ArrayList<>();
         return val;
     }
+    //TODO write back to the disk
+    public boolean addSpawn(Location loc) {
+        ArrayList<Integer> currentLoc = new ArrayList<Integer>();
+        currentLoc.add((int)loc.getX());
+        currentLoc.add((int)loc.getY());
+        currentLoc.add((int)loc.getZ());
+
+        spawns.add(currentLoc);
+
+        return true;
+    }
+
+    public boolean setSpawn(int index, Location loc) {
+        ArrayList<Integer> currentLoc = new ArrayList<Integer>();
+        currentLoc.add((int)loc.getX());
+        currentLoc.add((int)loc.getY());
+        currentLoc.add((int)loc.getZ());
+
+        spawns.set(index, currentLoc);
+
+        return true;
+    }
+
 }

@@ -1,6 +1,8 @@
 package net.SimpleSurvival;
 
+import net.SimpleSurvival.settings.GameSettings;
 import net.SimpleSurvival.settings.GameTemplate;
+import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -8,7 +10,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.World;
+import org.bukkit.scheduler.BukkitScheduler;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 // NOTE: It should be noticed that "settings to begin a game" and "settings for a currently running game"
@@ -19,24 +23,12 @@ import java.util.HashMap;
  * Created by maldridge on 11/8/14.
  */
 public class SimpleSurvival extends JavaPlugin {
-	SpawnManager spawnManager = new SpawnManager();
-	HashMap<String, WorldSettings> worldSettings = new HashMap<String, WorldSettings>();
 	// Map of games on particular worlds; Contains information about running/waiting games
 	// TODO: Save game settings and load them in a useful manner
 	// TODO: Remove players from the list of competitors when they disconnect
 	HashMap<String, GameTemplate> gameTemplates = new HashMap<String, GameTemplate>();
+    ArrayList<GameSettings> runningGames = new ArrayList<>();
 
-	public SimpleSurvival() {
-		for(World world : getServer().getWorlds()) {
-			worldSettings.put(world.getName(), new WorldSettings());
-			// TODO: Load these from a config file, e.g.
-			// {
-			//     "castles": "backup/castles.zip",
-			//     "river": "backup/river.zip"
-			// }
-			gameTemplates.put(world.getName(), new GameTemplate(world.getName(), world.getName()));
-		}
-	}
 
 	@EventHandler
 	public void onPlayerQuit(PlayerQuitEvent evt) {
@@ -49,6 +41,20 @@ public class SimpleSurvival extends JavaPlugin {
 			}
 		}
 	}
+
+    public void onEnable() {
+        BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
+        scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
+            @Override
+            public void run() {
+                for(GameTemplate game: gameTemplates.values()) {
+                    if(game.isReady()) {
+                            runningGames.add(game.createSettings());
+                    }
+                }
+            }
+        }, 0L, 200L);
+    }
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {

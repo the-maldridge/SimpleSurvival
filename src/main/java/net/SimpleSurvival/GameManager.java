@@ -1,12 +1,9 @@
 package net.SimpleSurvival;
 
 import net.SimpleSurvival.settings.GameSettings;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
@@ -21,13 +18,11 @@ import java.util.ArrayList;
  */
 public class GameManager implements Listener {
     GameSettings currentGame;
-    ArrayList<String> killers;
     ArrayList<String> spectators = new ArrayList<String>();
 
 
     public GameManager(GameSettings currentGame) {
         this.currentGame = currentGame;
-        this.killers = new ArrayList<String>(currentGame.getCompetitors());
     }
 
     public void gameStateFreeze(PlayerMoveEvent p) {
@@ -45,7 +40,7 @@ public class GameManager implements Listener {
             Player player = (Player)p;
             Player killer = player.getKiller();
 
-            spectators.add(killers.remove(killers.indexOf(killer.getName())));
+            spectators.add(currentGame.getCompetitors().remove(currentGame.getCompetitors().indexOf(killer.getName())));
             setSpectatorMode();
             for(Player pl: player.getWorld().getPlayers()) {
                 pl.sendMessage(ChatColor.RED + "[DEATH]" + ChatColor.BOLD + player.getName() + " was killed by " + ChatColor.BOLD + killer.getName());
@@ -73,5 +68,17 @@ public class GameManager implements Listener {
             }
 
         }
+    }
+
+    public boolean sendPlayersToSpawn() {
+        for (int i = 0; i < currentGame.getCompetitors().size(); i++) {
+            int x = currentGame.getSpawns().get(i).get(0);
+            int y = currentGame.getSpawns().get(i).get(1);
+            int z = currentGame.getSpawns().get(i).get(2);
+            World w = Bukkit.getWorld(currentGame.getRunningWorld());
+            Location nextSpawn = new Location(w, x, y, z);
+            Bukkit.getPlayer(currentGame.getCompetitors().get(i)).teleport(nextSpawn);
+        }
+        return true;
     }
 }

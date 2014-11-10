@@ -15,6 +15,16 @@ public class GameSettings {
     // and the fancy display name if oyu're into that kind of thing
     private GameTemplate staticSettings;
 
+    public String getRunningWorld() {
+        return runningWorld;
+    }
+
+    private String runningWorld;
+
+    public ArrayList<String> getCompetitors() {
+        return competitors;
+    }
+
     public GameSettings(ArrayList<String> competitors, GameTemplate staticSettings) {
         this.competitors = competitors;
         this.staticSettings = staticSettings;
@@ -30,6 +40,10 @@ public class GameSettings {
      */
     public enum GameState {
         RUNNING, PAUSED, FINISH
+    }
+
+    public List<List<Integer>> getSpawns() {
+        return this.staticSettings.getSpawns();
     }
 
     private GameState state;
