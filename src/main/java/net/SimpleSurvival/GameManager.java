@@ -18,6 +18,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -37,6 +38,7 @@ public class GameManager implements Listener {
         System.out.println("players passed to us " + currentGame.getCompetitors().toString());
         sendPlayersToSpawn();
         this.plugin.getServer().getPluginManager().registerEvents(new GameEvents(this.plugin, this.currentGame), this.plugin);
+        BukkitTask countDownTimer = new GameStarter(this.plugin, this.currentGame, 15).runTaskTimer(this.plugin, 0, 20);
     }
 
 
@@ -62,7 +64,7 @@ class GameEvents implements Listener {
     private ArrayList<String> spectators;
     private ArrayList<InventoryHolder> openedChests = new ArrayList<InventoryHolder>();
 
-    public gameEvents(SimpleSurvival plugin, GameSettings currentGame) {
+    public GameEvents(SimpleSurvival plugin, GameSettings currentGame) {
         this.plugin = plugin;
         this.currentGame = currentGame;
     }
@@ -124,8 +126,8 @@ class GameEvents implements Listener {
 class GameStarter extends BukkitRunnable {
 
     private final SimpleSurvival plugin;
-    private final GameSettings currentGame;
-    private final int countdown;
+    private GameSettings currentGame;
+    private int countdown;
 
     public GameStarter(SimpleSurvival plugin, GameSettings currentGame, int countdown) {
         this.plugin = plugin;
@@ -135,6 +137,18 @@ class GameStarter extends BukkitRunnable {
 
     @Override
     public void run() {
-
+        for(int i=0; i<currentGame.getCompetitors().size(); i++) {
+            Player p = Bukkit.getPlayer(currentGame.getCompetitors().get(i));
+            p.sendMessage("The game will begin in " + countdown + " seconds!");
+        }
+        countdown--;
+        if(countdown<=0) {
+            for(int i=0; i<currentGame.getCompetitors().size(); i++) {
+                Player p = Bukkit.getPlayer(currentGame.getCompetitors().get(i));
+                p.sendMessage("The game has begun!");
+            }
+            currentGame.setState(GameSettings.GameState.RUNNING);
+            this.cancel();
+        }
     }
 }

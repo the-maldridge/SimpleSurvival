@@ -56,6 +56,6 @@ public class GameSettings {
     public GameState getState() {
         return state;
     }
-
+    public void setState(GameState newState) { state = newState; }
 
 }
