@@ -5,6 +5,7 @@ import org.bukkit.*;
 import org.bukkit.entity.Player;
 
 import org.bukkit.block.Block;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -27,7 +28,8 @@ public class GameManager implements Listener {
 
     }
 
-    public void gameStateFreeze(PlayerMoveEvent p) {
+    @EventHandler
+    public void playerFreeze(PlayerMoveEvent p) {
         if((p != null) && (p instanceof Player)) {
             if (currentGame.getCompetitors().contains(((Player) p).getName())) {
                 if (currentGame.getState() == GameSettings.GameState.PAUSED) {

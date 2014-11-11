@@ -47,7 +47,7 @@ public class GameSettings {
         return this.staticSettings.getSpawns();
     }
 
-    private GameState state;
+    private GameState state = GameState.PAUSED;
 
     public GameState getState() {
         return state;
