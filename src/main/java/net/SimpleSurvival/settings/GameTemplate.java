@@ -67,11 +67,11 @@ public class GameTemplate {
         }
 
         System.out.println("Checking for loot");
-        Map<String, Object> lootNames = (Map<String, Object>)plugin.getConfig().getConfigurationSection("worlds." + sourceWorld + ".loot").getValues(false);
+        List<Map<?, ?>> lootMaps = (List<Map<?, ?>>)plugin.getConfig().getMapList("worlds." + sourceWorld + ".loot");
         this.loot = new HashMap<>();
-        for(String key: lootNames.keySet()) {
-            System.out.println("Found loot " + key);
-            this.loot.put(Material.getMaterial(key), (Double)lootNames.get(key));
+        for(Map<?, ?> map: lootMaps) {
+            System.out.println("Found loot " + (String)map.get("material"));
+            this.loot.put(Material.getMaterial((String)map.get("material")), (Double)map.get("frequency"));
         }
 
         List<String> breakableNames = plugin.getConfig().getStringList("worlds." + sourceWorld + ".breakables");
