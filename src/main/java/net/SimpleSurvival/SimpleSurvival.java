@@ -69,7 +69,7 @@ public class SimpleSurvival extends JavaPlugin {
                         this.plugin.getServer().createWorld(new WorldCreator(settings.getWorldUUID()));
                         // Add the world to the running games
                         System.out.println("world loaded, about to start");
-                        this.plugin.runningGames.add(new GameManager(settings));
+                        this.plugin.runningGames.add(new GameManager(this.plugin, settings));
                     }
                 }
             }
