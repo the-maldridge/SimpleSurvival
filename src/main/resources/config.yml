@@ -5,4 +5,4 @@ worlds:
         spawns:
           - 13,66,20
         loot:
-            STONE_SWORD: 100
+          - STONE_SWORD: 100

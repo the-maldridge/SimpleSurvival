@@ -115,6 +115,7 @@ class GameEvents implements Listener {
 
             if (!openedChests.contains(holder)) {
                 for (Map.Entry<Material, Double> lootEntry : currentGame.getLoot().entrySet()) {
+                    System.out.println("Checking loot entry " + lootEntry.toString());
                     if (Math.random() * 100 < lootEntry.getValue()) {
                         System.out.println("lootchance passed");
                         inventory.addItem(new ItemStack(lootEntry.getKey()));
@@ -122,6 +123,8 @@ class GameEvents implements Listener {
                         System.out.println("insufficient loot chance");
                     }
                 }
+            } else {
+                System.out.println("seen this chest before");
             }
         } else {
             System.out.println("not a chest");

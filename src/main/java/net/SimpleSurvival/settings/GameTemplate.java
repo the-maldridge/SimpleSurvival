@@ -66,9 +66,11 @@ public class GameTemplate {
             this.spawns.add(xyz);
         }
 
+        System.out.println("Checking for loot");
         Map<String, Object> lootNames = (Map<String, Object>)plugin.getConfig().getConfigurationSection("worlds." + sourceWorld + ".loot").getValues(false);
         this.loot = new HashMap<>();
         for(String key: lootNames.keySet()) {
+            System.out.println("Found loot " + key);
             this.loot.put(Material.getMaterial(key), (Double)lootNames.get(key));
         }
 
