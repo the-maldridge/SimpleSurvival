@@ -47,6 +47,10 @@ public class GameSettings {
         return this.staticSettings.getSpawns();
     }
 
+	public HashMap<Material, Double> getLoot() {
+		return this.staticSettings.getLoot();
+	}
+
     private GameState state = GameState.PAUSED;
 
     public GameState getState() {

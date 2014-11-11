@@ -5,15 +5,22 @@ import org.bukkit.*;
 import org.bukkit.entity.Player;
 
 import org.bukkit.block.Block;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.block.Chest;
+import org.bukkit.block.DoubleChest;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 
 /**
@@ -34,21 +41,6 @@ public class GameManager implements Listener {
 
 
 
-    @EventHandler
-    public void onChestOpen(PlayerInteractEvent playerInteractEvent) {
-        if (spectators.contains(playerInteractEvent.getPlayer().getName())) {
-            if (playerInteractEvent.getAction() == Action.RIGHT_CLICK_BLOCK) {
-                Block b = playerInteractEvent.getClickedBlock();
-                if (b.getType() == Material.CHEST) {
-                    playerInteractEvent.setCancelled(true);
-
-                }
-
-            }
-
-        }
-    }
-
     public boolean sendPlayersToSpawn() {
         System.out.println(currentGame.getCompetitors().size());
         for (int i = 0; i < currentGame.getCompetitors().size(); i++) {
@@ -68,6 +60,7 @@ class GameEvents implements Listener {
     private final GameSettings currentGame;
     SimpleSurvival plugin;
     private ArrayList<String> spectators;
+    private ArrayList<InventoryHolder> openedChests = new ArrayList<InventoryHolder>();
 
     public gameEvents(SimpleSurvival plugin, GameSettings currentGame) {
         this.plugin = plugin;
@@ -103,6 +96,27 @@ class GameEvents implements Listener {
             Player p = Bukkit.getPlayer(spectators.get(i));
             p.setGameMode(GameMode.ADVENTURE);
             p.setAllowFlight(true);
+        }
+    }
+
+    @EventHandler
+    public void onChestOpen(InventoryOpenEvent inventoryOpenEvent) {
+        String player = inventoryOpenEvent.getPlayer().getName();
+        Inventory inventory = inventoryOpenEvent.getInventory();
+        InventoryHolder holder = inventory.getHolder();
+        if (holder instanceof Chest || holder instanceof DoubleChest) { 
+            if (spectators.contains(player)) {
+                inventoryOpenEvent.setCancelled(true);
+                return;
+            }
+
+            if (!openedChests.contains(holder)) {
+                for (Map.Entry<Material, Double> lootEntry : currentGame.getLoot().entrySet()) {
+                    if (Math.random() * 100 < lootEntry.getValue()) {
+                        inventory.addItem(new ItemStack(lootEntry.getKey()));
+                    }
+                }
+            }
         }
     }
 }
