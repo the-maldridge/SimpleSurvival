@@ -5,5 +5,4 @@ worlds:
         spawns:
           - 13,66,20
         loot:
-          - material: STONE_SWORD
-            frequency: 100
+          - STONE_SWORD: 100
