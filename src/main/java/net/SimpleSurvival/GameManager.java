@@ -30,7 +30,6 @@ import java.util.Map;
 public class GameManager implements Listener {
     private final SimpleSurvival plugin;
     GameSettings currentGame;
-    ArrayList<String> spectators = new ArrayList<String>();
 
     public GameManager(SimpleSurvival plugin, GameSettings currentGame) {
         this.currentGame = currentGame;
@@ -61,7 +60,7 @@ public class GameManager implements Listener {
 class GameEvents implements Listener {
     private final GameSettings currentGame;
     SimpleSurvival plugin;
-    private ArrayList<String> spectators;
+    ArrayList<String> spectators = new ArrayList<String>();
     private ArrayList<InventoryHolder> openedChests = new ArrayList<InventoryHolder>();
 
     public GameEvents(SimpleSurvival plugin, GameSettings currentGame) {
@@ -110,15 +109,22 @@ class GameEvents implements Listener {
             if (spectators.contains(player)) {
                 inventoryOpenEvent.setCancelled(true);
                 return;
+            } else {
+                System.out.println("player check passed");
             }
 
             if (!openedChests.contains(holder)) {
                 for (Map.Entry<Material, Double> lootEntry : currentGame.getLoot().entrySet()) {
                     if (Math.random() * 100 < lootEntry.getValue()) {
+                        System.out.println("lootchance passed");
                         inventory.addItem(new ItemStack(lootEntry.getKey()));
+                    } else {
+                        System.out.println("insufficient loot chance");
                     }
                 }
             }
+        } else {
+            System.out.println("not a chest");
         }
     }
 }

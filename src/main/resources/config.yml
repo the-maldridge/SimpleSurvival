@@ -3,6 +3,6 @@ worlds:
         minPlayers: 1
         maxPlayers: 4
         spawns:
-          - 0,67,0
+          - 13,66,20
         loot:
             STONE_SWORD: 100
