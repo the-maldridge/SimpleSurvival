@@ -34,7 +34,13 @@ public class WorldManager {
     public void destroyWorld(String worldToDestroy) {
         //unload the world without saving, we are about to delete it anyway
         this.plugin.getServer().unloadWorld(worldToDestroy,false);
-
+        try {
+            Path toDelete = Paths.get(this.plugin.getServer().getWorldContainer().getCanonicalPath(), worldToDestroy);
+            Files.walkFileTree(toDelete, new DeletingFileVisitor(toDelete));
+        } catch(IOException e) {
+            this.plugin.getLogger().severe("Could not destroy world " + worldToDestroy);
+            this.plugin.getLogger().severe(e.toString());
+        }
     }
 
 

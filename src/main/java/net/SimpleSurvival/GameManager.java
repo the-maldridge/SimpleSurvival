@@ -79,15 +79,18 @@ class GameEvents implements Listener {
 
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
-            Player player = event.getEntity().getPlayer();
-            Player killer = player.getKiller();
+        Player player = event.getEntity().getPlayer();
+        Player killer = player.getKiller();
 
-            spectators.add(currentGame.getCompetitors().remove(currentGame.getCompetitors().indexOf(killer.getName())));
-            setSpectatorMode();
-            for (Player pl : player.getWorld().getPlayers()) {
-                pl.sendMessage(ChatColor.RED + "[DEATH]" + ChatColor.BOLD + player.getName() + " was killed by " + ChatColor.BOLD + killer.getName());
-            }
+        spectators.add(currentGame.getCompetitors().remove(currentGame.getCompetitors().indexOf(killer.getName())));
+        setSpectatorMode();
+        for (Player pl : player.getWorld().getPlayers()) {
+            pl.sendMessage(ChatColor.RED + "[DEATH]" + ChatColor.BOLD + player.getName() + " was killed by " + ChatColor.BOLD + killer.getName());
         }
+        if(currentGame.getCompetitors().size()<=0) {
+            BukkitTask countDownTimer = new GameEnder(this.plugin, this.currentGame, 10).runTaskTimer(this.plugin, 0, 20);
+        }
+    }
 
     private void setSpectatorMode() {
         for(int i=0; i<spectators.size(); i++) {
@@ -184,7 +187,7 @@ class GameEnder extends BukkitRunnable {
                 Player p = Bukkit.getPlayer(currentGame.getCompetitors().get(i));
                 p.sendMessage("Server Closing...");
             }
-            plugin.worldManager;
+            plugin.worldManager.destroyWorld(currentGame.getWorldUUID());
             this.cancel();
         }
     }
