@@ -75,7 +75,9 @@ class GameEvents implements Listener {
             if (currentGame.getState() == GameSettings.GameState.PAUSED) {
                 Vector to = event.getTo().toVector();
                 Vector from = event.getFrom().toVector();
+                Player player = event.getPlayer();
                 if (to.getX() != from.getX() || to.getZ() != from.getZ()) {
+                    player.teleport(event.getFrom());
                     event.setCancelled(true);
                 }
             }
