@@ -87,14 +87,20 @@ class GameEvents implements Listener {
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
         Player player = event.getEntity().getPlayer();
-        Player killer = player.getKiller();
 
-        spectators.add(currentGame.getCompetitors().remove(currentGame.getCompetitors().indexOf(killer.getName())));
-        setSpectatorMode();
-        for (Player pl : player.getWorld().getPlayers()) {
-            pl.sendMessage(ChatColor.RED + "[DEATH]" + ChatColor.BOLD + player.getName() + " was killed by " + ChatColor.BOLD + killer.getName());
+        if(player.getKiller() instanceof Player) {
+            Player killer = player.getKiller();
+            spectators.add(currentGame.getCompetitors().remove(currentGame.getCompetitors().indexOf(player)));
+            setSpectatorMode();
+            for (Player pl : player.getWorld().getPlayers()) {
+                pl.sendMessage(ChatColor.RED + "[DEATH]" + ChatColor.BOLD + player.getName() + " was killed by " + ChatColor.BOLD + killer.getName());
+            }
+        } else {
+            for (Player pl : player.getWorld().getPlayers()) {
+                pl.sendMessage(ChatColor.RED + "[DEATH]" + ChatColor.BOLD + player.getName() + " was killed by the environment");
+            }
         }
-        if(currentGame.getCompetitors().size()<=0) {
+        if(currentGame.getCompetitors().size()<=1) {
             BukkitTask countDownTimer = new GameEnder(this.plugin, this.currentGame, 10).runTaskTimer(this.plugin, 0, 20);
         }
     }
@@ -191,9 +197,11 @@ class GameEnder extends BukkitRunnable {
     public void run() {
         countdown--;
         if(countdown<=0) {
-            for(int i=0; i<currentGame.getCompetitors().size(); i++) {
-                Player p = Bukkit.getPlayer(currentGame.getCompetitors().get(i));
+            for(Player p: Bukkit.getWorld(currentGame.getWorldUUID()).getPlayers()) {
                 p.sendMessage("Server Closing...");
+            }
+            for(Player p: Bukkit.getWorld(currentGame.getWorldUUID()).getPlayers()) {
+                p.teleport(p);
             }
             plugin.worldManager.destroyWorld(currentGame.getWorldUUID());
             this.cancel();
