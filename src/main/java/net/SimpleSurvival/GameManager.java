@@ -121,6 +121,7 @@ class GameEvents implements Listener {
             }
 
             if (!openedChests.contains(holder)) {
+                openedChests.add(holder);
                 for (Map.Entry<Material, Double> lootEntry : currentGame.getLoot().entrySet()) {
                     System.out.println("Checking loot entry " + lootEntry.toString());
                     if (Math.random() * 100 < lootEntry.getValue()) {
