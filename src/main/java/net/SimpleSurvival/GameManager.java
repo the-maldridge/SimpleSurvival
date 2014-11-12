@@ -201,7 +201,7 @@ class GameEnder extends BukkitRunnable {
                 p.sendMessage("Server Closing...");
             }
             for(Player p: Bukkit.getWorld(currentGame.getWorldUUID()).getPlayers()) {
-                p.teleport(p);
+                p.teleport(new Location(Bukkit.getWorld(this.plugin.homeworld),0,0,0));
             }
             plugin.worldManager.destroyWorld(currentGame.getWorldUUID());
             this.cancel();
