@@ -31,6 +31,7 @@ public class SimpleSurvival extends JavaPlugin {
 	HashMap<String, GameTemplate> gameTemplates = new HashMap<String, GameTemplate>();
     ArrayList<GameManager> runningGames = new ArrayList<>();
     WorldManager worldManager = new WorldManager(this);
+    String homeworld = "world";
 
     public SimpleSurvival() {
         String[] worlds = this.getDataFolder().list();
@@ -40,6 +41,7 @@ public class SimpleSurvival extends JavaPlugin {
                 gameTemplates.put(world, new GameTemplate(this, world, world));
             }
         }
+        homeworld = this.getConfig().getString("lobby");
     }
 
 	@EventHandler
@@ -55,7 +57,7 @@ public class SimpleSurvival extends JavaPlugin {
 	}
 
     public void onEnable() {
-        //this.saveDefaultConfig();
+        this.saveDefaultConfig();
         BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
         scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
             SimpleSurvival plugin = SimpleSurvival.this;
