@@ -12,6 +12,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.scheduler.BukkitScheduler;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -34,7 +35,7 @@ public class SimpleSurvival extends JavaPlugin {
     public SimpleSurvival() {
         String[] worlds = this.getDataFolder().list();
         for(String world: worlds) {
-            if (!world.equals("config.yml")) {
+            if ((new File(this.getDataFolder(), world).isDirectory())) {
                 this.getLogger().info("Found template world " + world);
                 gameTemplates.put(world, new GameTemplate(this, world, world));
             }

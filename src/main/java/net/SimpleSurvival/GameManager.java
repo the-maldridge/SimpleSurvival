@@ -78,11 +78,9 @@ class GameEvents implements Listener {
     }
 
     @EventHandler
-    public void onPlayerDeath(PlayerDeathEvent p) {
-        if ((p != null) && (p instanceof Player)) {
-            Player player = (Player) p;
+    public void onPlayerDeath(PlayerDeathEvent event) {
+            Player player = event.getEntity().getPlayer();
             Player killer = player.getKiller();
-
 
             spectators.add(currentGame.getCompetitors().remove(currentGame.getCompetitors().indexOf(killer.getName())));
             setSpectatorMode();
@@ -90,7 +88,6 @@ class GameEvents implements Listener {
                 pl.sendMessage(ChatColor.RED + "[DEATH]" + ChatColor.BOLD + player.getName() + " was killed by " + ChatColor.BOLD + killer.getName());
             }
         }
-    }
 
     private void setSpectatorMode() {
         for(int i=0; i<spectators.size(); i++) {
