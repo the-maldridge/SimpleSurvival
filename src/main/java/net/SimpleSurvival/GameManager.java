@@ -86,15 +86,18 @@ class GameEvents implements Listener {
 
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
-            Player player = event.getEntity().getPlayer();
-            Player killer = player.getKiller();
+        Player player = event.getEntity().getPlayer();
+        Player killer = player.getKiller();
 
-            spectators.add(currentGame.getCompetitors().remove(currentGame.getCompetitors().indexOf(killer.getName())));
-            setSpectatorMode();
-            for (Player pl : player.getWorld().getPlayers()) {
-                pl.sendMessage(ChatColor.RED + "[DEATH]" + ChatColor.BOLD + player.getName() + " was killed by " + ChatColor.BOLD + killer.getName());
-            }
+        spectators.add(currentGame.getCompetitors().remove(currentGame.getCompetitors().indexOf(killer.getName())));
+        setSpectatorMode();
+        for (Player pl : player.getWorld().getPlayers()) {
+            pl.sendMessage(ChatColor.RED + "[DEATH]" + ChatColor.BOLD + player.getName() + " was killed by " + ChatColor.BOLD + killer.getName());
         }
+        if(currentGame.getCompetitors().size()<=0) {
+            BukkitTask countDownTimer = new GameEnder(this.plugin, this.currentGame, 10).runTaskTimer(this.plugin, 0, 20);
+        }
+    }
 
     private void setSpectatorMode() {
         for(int i=0; i<spectators.size(); i++) {
@@ -161,6 +164,37 @@ class GameStarter extends BukkitRunnable {
                 p.sendMessage("The game has begun!");
             }
             currentGame.setState(GameSettings.GameState.RUNNING);
+            this.cancel();
+        }
+    }
+}
+
+class GameEnder extends BukkitRunnable {
+
+    private final SimpleSurvival plugin;
+    private GameSettings currentGame;
+    private int countdown;
+
+    public GameEnder(SimpleSurvival plugin, GameSettings currentGame, int countdown) {
+        this.plugin = plugin;
+        this.currentGame = currentGame;
+        this.countdown = countdown;
+
+        for(int i=0; i<currentGame.getCompetitors().size(); i++) {
+            Player p = Bukkit.getPlayer(currentGame.getCompetitors().get(i));
+            p.sendMessage("The world will close in " + countdown + " seconds!");
+        }
+    }
+
+    @Override
+    public void run() {
+        countdown--;
+        if(countdown<=0) {
+            for(int i=0; i<currentGame.getCompetitors().size(); i++) {
+                Player p = Bukkit.getPlayer(currentGame.getCompetitors().get(i));
+                p.sendMessage("Server Closing...");
+            }
+            plugin.worldManager.destroyWorld(currentGame.getWorldUUID());
             this.cancel();
         }
     }
