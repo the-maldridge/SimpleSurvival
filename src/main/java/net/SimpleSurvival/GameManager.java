@@ -19,6 +19,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -72,7 +73,11 @@ class GameEvents implements Listener {
     public void onPlayerMove(PlayerMoveEvent event) {
         if (currentGame.getCompetitors().contains(event.getPlayer().getName())) {
             if (currentGame.getState() == GameSettings.GameState.PAUSED) {
-                event.setCancelled(true);
+                Vector to = event.getTo().toVector();
+                Vector from = event.getFrom().toVector();
+                if (to.getX() != from.getX() || to.getZ() != from.getZ()) {
+                    event.setCancelled(true);
+                }
             }
         }
     }
