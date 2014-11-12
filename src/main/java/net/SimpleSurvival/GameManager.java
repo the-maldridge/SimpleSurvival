@@ -158,3 +158,34 @@ class GameStarter extends BukkitRunnable {
         }
     }
 }
+
+class GameEnder extends BukkitRunnable {
+
+    private final SimpleSurvival plugin;
+    private GameSettings currentGame;
+    private int countdown;
+
+    public GameEnder(SimpleSurvival plugin, GameSettings currentGame, int countdown) {
+        this.plugin = plugin;
+        this.currentGame = currentGame;
+        this.countdown = countdown;
+
+        for(int i=0; i<currentGame.getCompetitors().size(); i++) {
+            Player p = Bukkit.getPlayer(currentGame.getCompetitors().get(i));
+            p.sendMessage("The world will close in " + countdown + " seconds!");
+        }
+    }
+
+    @Override
+    public void run() {
+        countdown--;
+        if(countdown<=0) {
+            for(int i=0; i<currentGame.getCompetitors().size(); i++) {
+                Player p = Bukkit.getPlayer(currentGame.getCompetitors().get(i));
+                p.sendMessage("Server Closing...");
+            }
+            plugin.worldManager;
+            this.cancel();
+        }
+    }
+}
