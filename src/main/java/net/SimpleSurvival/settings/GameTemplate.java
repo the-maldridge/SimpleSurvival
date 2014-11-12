@@ -12,8 +12,8 @@ import java.util.*;
  * Created by Reid Levenick on 11/9/14.
  */
 public class GameTemplate {
-    private final int minPlayers;
-    private final int maxPlayers;
+    private int minPlayers=1;
+    private int maxPlayers;
 
     public boolean isReady() {
         return competitors.size()>=minPlayers;

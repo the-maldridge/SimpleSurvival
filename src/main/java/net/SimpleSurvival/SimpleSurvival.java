@@ -34,8 +34,10 @@ public class SimpleSurvival extends JavaPlugin {
     public SimpleSurvival() {
         String[] worlds = this.getDataFolder().list();
         for(String world: worlds) {
-            this.getLogger().info("Found template world " + world);
-            gameTemplates.put(world, new GameTemplate(this, world, world));
+            if (!world.equals("config.yml")) {
+                this.getLogger().info("Found template world " + world);
+                gameTemplates.put(world, new GameTemplate(this, world, world));
+            }
         }
     }
 
@@ -63,6 +65,7 @@ public class SimpleSurvival extends JavaPlugin {
                         // FIXME: Btw I changed this maldridge, look at it because I'm going to forget
                         // Get the settings for the world
                         GameSettings settings = game.createSettings();
+                        System.out.println(game.isReady() + settings.getCompetitors().toString() + settings.getWorld());
                         // Copy the world data into the running worlds
                         this.plugin.worldManager.newWorldFromTemplate(settings.getWorld(), settings.getWorldUUID());
                         // Load the world into memory
