@@ -57,7 +57,7 @@ public class SimpleSurvival extends JavaPlugin {
 	}
 
     public void onEnable() {
-        //this.saveDefaultConfig();
+        this.saveDefaultConfig();
         BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
         scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
             SimpleSurvival plugin = SimpleSurvival.this;
