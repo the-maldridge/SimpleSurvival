@@ -125,6 +125,7 @@ public class GameManager implements Listener {
                     Player killer = ((Player) event.getDamager()).getPlayer();
                     if (victim.getHealth() - event.getDamage() <= 0) {
                         //Player is dead
+                        event.setCancelled(true);
                         spectators.add(competitors.remove(competitors.indexOf(victim.getName())));
                         setSpectatorMode(victim.getName());
                         for (Player pl : Bukkit.getWorld(worldUUID).getPlayers()) {
@@ -132,8 +133,6 @@ public class GameManager implements Listener {
                         }
                     }
                 }
-                event.setCancelled(true);
-
                 //if there is only one competitor left, set the game state to finished
                 if (competitors.size() <= 1) {
                     state = GameState.FINISHED;
@@ -149,12 +148,12 @@ public class GameManager implements Listener {
                 Player victim = ((Player) event.getEntity()).getPlayer();
                 if (victim.getHealth() - event.getDamage() <= 0) {
                     //Player is dead
+                    event.setCancelled(true);
                     setSpectatorMode(victim.getName());
                     for (Player pl : Bukkit.getWorld(worldUUID).getPlayers()) {
                         pl.sendMessage(ChatColor.RED + "[DEATH]" + ChatColor.BOLD + victim.getName() + " was killed by " + ChatColor.BOLD + event.getCause().toString());
                     }
                 }
-                event.setCancelled(true);
 
                 //if there is only one competitor left, set the game state to finished
                 if (competitors.size() <= 1) {
