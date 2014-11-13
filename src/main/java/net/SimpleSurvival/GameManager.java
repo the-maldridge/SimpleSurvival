@@ -37,7 +37,7 @@ public class GameManager implements Listener {
         this.staticSettings = staticSettings;
         this.competitors = competitors;
         this.plugin.getLogger().info("Players given to us " + competitors.toString());
-        this.plugin.getPluginLoader().createRegisteredListeners(this, this.plugin);
+        this.plugin.getServer().getPluginManager().registerEvents(this, this.plugin);
     }
 
     public ArrayList<String> getCompetitors() {
@@ -86,7 +86,7 @@ public class GameManager implements Listener {
         }
 
         if(state == GameState.BEFORE_GAME) {
-            new GameStarter(this.plugin, this, 15).runTaskTimer(this.plugin, 0, 20);
+            new GameStarter(this.plugin, 15).runTaskTimer(this.plugin, 0, 20);
             state = GameState.STARTING;
         }
 
@@ -201,22 +201,19 @@ class GameStarter extends BukkitRunnable {
     private GameManager currentGame;
     private int countdown;
 
-    public GameStarter(SimpleSurvival plugin, GameManager currentGame, int countdown) {
+    public GameStarter(SimpleSurvival plugin, int countdown) {
         this.plugin = plugin;
-        this.currentGame = currentGame;
         this.countdown = countdown;
     }
 
     @Override
     public void run() {
-        for (int i = 0; i < currentGame.getCompetitors().size(); i++) {
-            Player p = Bukkit.getPlayer(currentGame.getCompetitors().get(i));
+        for (Player p: Bukkit.getWorld(currentGame.getWorldUUID()).getPlayers()) {
             p.sendMessage("The game will begin in " + countdown + " seconds!");
         }
         countdown--;
         if (countdown <= 0) {
-            for (int i = 0; i < currentGame.getCompetitors().size(); i++) {
-                Player p = Bukkit.getPlayer(currentGame.getCompetitors().get(i));
+            for (Player p: Bukkit.getWorld(currentGame.getWorldUUID()).getPlayers()) {
                 p.sendMessage("The game has begun!");
             }
             currentGame.setState(GameManager.GameState.RUNNING);
@@ -249,7 +246,7 @@ class GameEnder extends BukkitRunnable {
                 p.sendMessage("Server Closing...");
             }
             for (Player p : Bukkit.getWorld(currentGame.getWorldUUID()).getPlayers()) {
-                p.teleport(new Location(Bukkit.getWorld(this.plugin.homeworld), 0, 0, 0));
+                p.teleport(new Location(Bukkit.getWorld("world"), 0, 0, 0));
             }
             plugin.worldManager.destroyWorld(currentGame.getWorldUUID());
             this.cancel();
