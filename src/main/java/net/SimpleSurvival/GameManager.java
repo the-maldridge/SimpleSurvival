@@ -103,6 +103,11 @@ class GameEvents implements Listener {
                 }
             }
             event.setCancelled(true);
+
+            //if there is only one competitor left, set the gameEnder task
+            if(currentGame.getCompetitors().size()<=1) {
+                BukkitTask countDownTimer = new GameEnder(this.plugin, this.currentGame, 10).runTaskTimer(this.plugin, 0, 20);
+            }
         }
     }
 
@@ -119,6 +124,11 @@ class GameEvents implements Listener {
                 }
             }
             event.setCancelled(true);
+
+            //if there is only one competitor left, set the gameEnder task
+            if(currentGame.getCompetitors().size()<=1) {
+                BukkitTask countDownTimer = new GameEnder(this.plugin, this.currentGame, 10).runTaskTimer(this.plugin, 0, 20);
+            }
         }
     }
 
@@ -205,8 +215,7 @@ class GameEnder extends BukkitRunnable {
         this.currentGame = currentGame;
         this.countdown = countdown;
 
-        for(int i=0; i<currentGame.getCompetitors().size(); i++) {
-            Player p = Bukkit.getPlayer(currentGame.getCompetitors().get(i));
+        for(Player p: Bukkit.getWorld(currentGame.getWorldUUID()).getPlayers()) {
             p.sendMessage("The world will close in " + countdown + " seconds!");
         }
     }
