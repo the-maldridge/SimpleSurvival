@@ -126,7 +126,7 @@ public class GameManager implements Listener {
                     if (victim.getHealth() - event.getDamage() <= 0) {
                         //Player is dead
                         event.setCancelled(true);
-                        spectators.add(competitors.remove(competitors.indexOf(victim.getName())));
+                        competitors.remove(competitors.indexOf(victim.getName()));
                         setSpectatorMode(victim.getName());
                         for (Player pl : Bukkit.getWorld(worldUUID).getPlayers()) {
                             pl.sendMessage(ChatColor.RED + "[DEATH]" + ChatColor.BOLD + victim.getName() + " was killed by " + ChatColor.BOLD + killer.getName());
@@ -149,6 +149,7 @@ public class GameManager implements Listener {
                 if (victim.getHealth() - event.getDamage() <= 0) {
                     //Player is dead
                     event.setCancelled(true);
+                    competitors.remove(victim.getName());
                     setSpectatorMode(victim.getName());
                     for (Player pl : Bukkit.getWorld(worldUUID).getPlayers()) {
                         pl.sendMessage(ChatColor.RED + "[DEATH]" + ChatColor.BOLD + victim.getName() + " was killed by " + ChatColor.BOLD + event.getCause().toString());
