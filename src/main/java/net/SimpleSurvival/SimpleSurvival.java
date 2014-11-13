@@ -1,7 +1,5 @@
 package net.SimpleSurvival;
 
-import net.SimpleSurvival.settings.GameSettings;
-import net.SimpleSurvival.settings.GameTemplate;
 import org.bukkit.Bukkit;
 import org.bukkit.WorldCreator;
 import org.bukkit.event.EventHandler;
@@ -67,15 +65,16 @@ public class SimpleSurvival extends JavaPlugin {
                     if (game.isReady()) {
                         // FIXME: Btw I changed this maldridge, look at it because I'm going to forget
                         // Get the settings for the world
-                        GameSettings settings = game.createSettings();
-                        System.out.println(game.isReady() + settings.getCompetitors().toString() + settings.getWorld());
+                        GameManager manager = game.createGame(this.plugin);
                         // Copy the world data into the running worlds
-                        this.plugin.worldManager.newWorldFromTemplate(settings.getWorld(), settings.getWorldUUID());
+                        this.plugin.worldManager.newWorldFromTemplate(manager.getWorld(), manager.getWorldUUID());
                         // Load the world into memory
-                        this.plugin.getServer().createWorld(new WorldCreator(settings.getWorldUUID()));
+                        this.plugin.getServer().createWorld(new WorldCreator(manager.getWorldUUID()));
+                        // Send the players there
+                        manager.sendPlayersToSpawn();
                         // Add the world to the running games
                         System.out.println("world loaded, about to start");
-                        this.plugin.runningGames.add(new GameManager(this.plugin, settings));
+                        this.plugin.runningGames.add(manager);
                     }
                 }
             }

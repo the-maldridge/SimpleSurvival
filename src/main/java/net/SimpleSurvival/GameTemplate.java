@@ -1,5 +1,6 @@
-package net.SimpleSurvival.settings;
+package net.SimpleSurvival;
 
+import net.SimpleSurvival.GameManager;
 import net.SimpleSurvival.SimpleSurvival;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -102,9 +103,9 @@ public class GameTemplate {
         competitors.remove(competitor);
     }
 
-    public GameSettings createSettings() {
+    public GameManager createGame(SimpleSurvival plugin) {
         // Spins off a new GameSettings from GameTemplate to represent a running game
-        GameSettings val = new GameSettings(competitors, this);
+        GameManager val = new GameManager(plugin, this, competitors);
         for(String p: competitors) {
             Bukkit.getPlayer(p).sendMessage("The game is about to begin");
         }
