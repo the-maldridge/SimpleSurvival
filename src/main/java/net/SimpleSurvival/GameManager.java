@@ -117,45 +117,49 @@ public class GameManager implements Listener {
 
     @EventHandler
     public void onPlayerDamage(EntityDamageByEntityEvent event) {
-        if (event.getEntity() instanceof Player) {
-            if (event.getDamager() instanceof Player) {
-                //damage caused by PvP
-                Player victim = ((Player) event.getEntity()).getPlayer();
-                Player killer = ((Player) event.getDamager()).getPlayer();
-                if (victim.getHealth() - event.getDamage() <= 0) {
-                    //Player is dead
-                    spectators.add(competitors.remove(competitors.indexOf(victim.getName())));
-                    setSpectatorMode(victim.getName());
-                    for (Player pl : Bukkit.getWorld(worldUUID).getPlayers()) {
-                        pl.sendMessage(ChatColor.RED + "[DEATH]" + ChatColor.BOLD + pl.getName() + " was killed by " + ChatColor.BOLD + killer.getName());
+        if (event.getEntity().getWorld().getName() == worldUUID) {
+            if (event.getEntity() instanceof Player) {
+                if (event.getDamager() instanceof Player) {
+                    //damage caused by PvP
+                    Player victim = ((Player) event.getEntity()).getPlayer();
+                    Player killer = ((Player) event.getDamager()).getPlayer();
+                    if (victim.getHealth() - event.getDamage() <= 0) {
+                        //Player is dead
+                        spectators.add(competitors.remove(competitors.indexOf(victim.getName())));
+                        setSpectatorMode(victim.getName());
+                        for (Player pl : Bukkit.getWorld(worldUUID).getPlayers()) {
+                            pl.sendMessage(ChatColor.RED + "[DEATH]" + ChatColor.BOLD + pl.getName() + " was killed by " + ChatColor.BOLD + killer.getName());
+                        }
                     }
                 }
-            }
-            event.setCancelled(true);
+                event.setCancelled(true);
 
-            //if there is only one competitor left, set the game state to finished
-            if (competitors.size() <= 1) {
-                state = GameState.FINISHED;
+                //if there is only one competitor left, set the game state to finished
+                if (competitors.size() <= 1) {
+                    state = GameState.FINISHED;
+                }
             }
         }
     }
 
     @EventHandler
     public void onPlayerDamage(EntityDamageEvent event) {
-        if (event.getEntity() instanceof Player) {
-            Player victim = ((Player) event.getEntity()).getPlayer();
-            if (victim.getHealth() - event.getDamage() <= 0) {
-                //Player is dead
-                setSpectatorMode(victim.getName());
-                for (Player pl : Bukkit.getWorld(worldUUID).getPlayers()) {
-                    pl.sendMessage(ChatColor.RED + "[DEATH]" + ChatColor.BOLD + pl.getName() + " was killed by " + ChatColor.BOLD + event.getCause().toString());
+        if (event.getEntity().getWorld().getName() == worldUUID) {
+            if (event.getEntity() instanceof Player) {
+                Player victim = ((Player) event.getEntity()).getPlayer();
+                if (victim.getHealth() - event.getDamage() <= 0) {
+                    //Player is dead
+                    setSpectatorMode(victim.getName());
+                    for (Player pl : Bukkit.getWorld(worldUUID).getPlayers()) {
+                        pl.sendMessage(ChatColor.RED + "[DEATH]" + ChatColor.BOLD + pl.getName() + " was killed by " + ChatColor.BOLD + event.getCause().toString());
+                    }
                 }
-            }
-            event.setCancelled(true);
+                event.setCancelled(true);
 
-            //if there is only one competitor left, set the game state to finished
-            if (competitors.size() <= 1) {
-                state = GameState.FINISHED;
+                //if there is only one competitor left, set the game state to finished
+                if (competitors.size() <= 1) {
+                    state = GameState.FINISHED;
+                }
             }
         }
     }
@@ -169,33 +173,35 @@ public class GameManager implements Listener {
 
     @EventHandler
     public void onChestOpen(InventoryOpenEvent inventoryOpenEvent) {
-        String player = inventoryOpenEvent.getPlayer().getName();
-        Inventory inventory = inventoryOpenEvent.getInventory();
-        InventoryHolder holder = inventory.getHolder();
-        if (holder instanceof Chest || holder instanceof DoubleChest) {
-            if (spectators.contains(player)) {
-                inventoryOpenEvent.setCancelled(true);
-                return;
-            } else {
-                System.out.println("player check passed");
-            }
+        if (inventoryOpenEvent.getPlayer().getWorld().getName() == worldUUID) {
+            String player = inventoryOpenEvent.getPlayer().getName();
+            Inventory inventory = inventoryOpenEvent.getInventory();
+            InventoryHolder holder = inventory.getHolder();
+            if (holder instanceof Chest || holder instanceof DoubleChest) {
+                if (spectators.contains(player)) {
+                    inventoryOpenEvent.setCancelled(true);
+                    return;
+                } else {
+                    System.out.println("player check passed");
+                }
 
-            if (!openedChests.contains(holder)) {
-                openedChests.add(holder);
-                for (Map.Entry<Material, Double> lootEntry : staticSettings.getLoot().entrySet()) {
-                    System.out.println("Checking loot entry " + lootEntry.toString());
-                    if (Math.random() * 100 < lootEntry.getValue()) {
-                        System.out.println("lootchance passed");
-                        inventory.addItem(new ItemStack(lootEntry.getKey()));
-                    } else {
-                        System.out.println("insufficient loot chance");
+                if (!openedChests.contains(holder)) {
+                    openedChests.add(holder);
+                    for (Map.Entry<Material, Double> lootEntry : staticSettings.getLoot().entrySet()) {
+                        System.out.println("Checking loot entry " + lootEntry.toString());
+                        if (Math.random() * 100 < lootEntry.getValue()) {
+                            System.out.println("lootchance passed");
+                            inventory.addItem(new ItemStack(lootEntry.getKey()));
+                        } else {
+                            System.out.println("insufficient loot chance");
+                        }
                     }
+                } else {
+                    System.out.println("seen this chest before");
                 }
             } else {
-                System.out.println("seen this chest before");
+                System.out.println("not a chest");
             }
-        } else {
-            System.out.println("not a chest");
         }
     }
 
