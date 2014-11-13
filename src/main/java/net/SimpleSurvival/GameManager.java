@@ -270,12 +270,16 @@ class GameEnder extends BukkitRunnable {
             for (Player p : Bukkit.getWorld(currentGame.getWorldUUID()).getPlayers()) {
                 p.setGameMode(GameMode.SURVIVAL);
                 p.setAllowFlight(false);
-                p.teleport(new Location(Bukkit.getServer().getWorlds().get(0), 0, 0, 0));
                 p.getInventory().clear();
                 for(Player player : Bukkit.getWorld(currentGame.getWorldUUID()).getPlayers()) {
                     p.showPlayer(player);
                 }
             }
+
+            for(Player p : Bukkit.getWorld(currentGame.getWorldUUID()).getPlayers()) {
+                p.teleport(Bukkit.getServer().getWorlds().get(0).getSpawnLocation());
+            }
+
             plugin.worldManager.destroyWorld(currentGame.getWorldUUID());
             this.cancel();
         }
