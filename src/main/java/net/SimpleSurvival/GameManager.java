@@ -5,6 +5,8 @@ import org.bukkit.*;
 import org.bukkit.entity.Player;
 
 import org.bukkit.block.Block;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
@@ -85,23 +87,38 @@ class GameEvents implements Listener {
     }
 
     @EventHandler
-    public void onPlayerDeath(PlayerDeathEvent event) {
-        Player player = event.getEntity().getPlayer();
-
-        if(player.getKiller() instanceof Player) {
-            Player killer = player.getKiller();
-            spectators.add(currentGame.getCompetitors().remove(currentGame.getCompetitors().indexOf(player)));
-            setSpectatorMode();
-            for (Player pl : player.getWorld().getPlayers()) {
-                pl.sendMessage(ChatColor.RED + "[DEATH]" + ChatColor.BOLD + player.getName() + " was killed by " + ChatColor.BOLD + killer.getName());
+    public void onPlayerDamage(EntityDamageByEntityEvent event) {
+        if (event.getEntity() instanceof Player) {
+            if (event.getDamager() instanceof Player) {
+                //damage caused by PvP
+                Player victim = ((Player) event.getEntity()).getPlayer();
+                Player killer = ((Player) event.getDamager()).getPlayer();
+                if (victim.getHealth() - event.getDamage() <= 0) {
+                    //Player is dead
+                    spectators.add(currentGame.getCompetitors().remove(currentGame.getCompetitors().indexOf(victim.getName())));
+                    setSpectatorMode();
+                    for (Player pl : Bukkit.getWorld(currentGame.getWorldUUID()).getPlayers()) {
+                        pl.sendMessage(ChatColor.RED + "[DEATH]" + ChatColor.BOLD + pl.getName() + " was killed by " + ChatColor.BOLD + killer.getName());
+                    }
+                }
             }
-        } else {
-            for (Player pl : player.getWorld().getPlayers()) {
-                pl.sendMessage(ChatColor.RED + "[DEATH]" + ChatColor.BOLD + player.getName() + " was killed by the environment");
-            }
+            event.setCancelled(true);
         }
-        if(currentGame.getCompetitors().size()<=1) {
-            BukkitTask countDownTimer = new GameEnder(this.plugin, this.currentGame, 10).runTaskTimer(this.plugin, 0, 20);
+    }
+
+    @EventHandler
+    public void onPlayerDamage(EntityDamageEvent event) {
+        if (event.getEntity() instanceof Player) {
+            Player victim = ((Player) event.getEntity()).getPlayer();
+            if (victim.getHealth() - event.getDamage() <= 0) {
+                //Player is dead
+                spectators.add(currentGame.getCompetitors().remove(currentGame.getCompetitors().indexOf(victim.getName())));
+                setSpectatorMode();
+                for (Player pl : Bukkit.getWorld(currentGame.getWorldUUID()).getPlayers()) {
+                    pl.sendMessage(ChatColor.RED + "[DEATH]" + ChatColor.BOLD + pl.getName() + " was killed by " + ChatColor.BOLD + event.getCause().toString());
+                }
+            }
+            event.setCancelled(true);
         }
     }
 
