@@ -248,8 +248,6 @@ class GameEnder extends BukkitRunnable {
         this.currentGame = currentGame;
         this.countdown = countdown;
 
-		currentGame.unregisterListeners();
-
         for (Player p : Bukkit.getWorld(this.currentGame.getWorldUUID()).getPlayers()) {
             p.sendMessage("The world will close in " + countdown + " seconds!");
         }
@@ -270,5 +268,7 @@ class GameEnder extends BukkitRunnable {
             plugin.worldManager.destroyWorld(currentGame.getWorldUUID());
             this.cancel();
         }
+
+		currentGame.unregisterListeners();
     }
 }
