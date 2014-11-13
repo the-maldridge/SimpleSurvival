@@ -6,6 +6,7 @@ import org.bukkit.block.DoubleChest;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
@@ -215,11 +216,19 @@ public class GameManager implements Listener {
         }
     }
 
+    @EventHandler
+    public void onBlockBreak(BlockBreakEvent breakEvent) {
+        if(!this.staticSettings.getBreakables().contains(breakEvent.getBlock())) {
+            breakEvent.setCancelled(true);
+        }
+    }
+
 	public void unregisterListeners() {
 		PlayerMoveEvent.getHandlerList().unregister(this);
 		EntityDamageEvent.getHandlerList().unregister(this);
 		EntityDamageByEntityEvent.getHandlerList().unregister(this);
 		InventoryOpenEvent.getHandlerList().unregister(this);
+        BlockBreakEvent.getHandlerList().unregister(this);
 	}
 }
 
