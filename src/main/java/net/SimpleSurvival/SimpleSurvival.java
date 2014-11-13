@@ -75,6 +75,12 @@ public class SimpleSurvival extends JavaPlugin {
                         this.plugin.runningGames.add(manager);
                     }
                 }
+
+                for(int i=0; i<this.plugin.runningGames.size(); i++) {
+                    if(this.plugin.runningGames.get(i).getState() == GameManager.GameState.FINISHED) {
+                        this.plugin.runningGames.remove(i--).end();
+                    }
+                }
             }
         }, 0L, 200L);
     }
