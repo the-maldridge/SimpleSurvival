@@ -205,8 +205,6 @@ public class GameManager implements Listener {
 		EntityDamageByEntityEvent.getHandlerList().unregister(this);
 		InventoryOpenEvent.getHandlerList().unregister(this);
 	}
-
-    public enum GameState {BEFORE_GAME, STARTING, RUNNING, PAUSED, FINISHED}
 }
 
 class GameStarter extends BukkitRunnable {
