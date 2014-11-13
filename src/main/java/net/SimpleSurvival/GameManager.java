@@ -5,6 +5,8 @@ import org.bukkit.*;
 import org.bukkit.entity.Player;
 
 import org.bukkit.block.Block;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
@@ -92,17 +94,48 @@ class GameEvents implements Listener {
     }
 
     @EventHandler
-    public void onPlayerDeath(PlayerDeathEvent event) {
-        Player player = event.getEntity().getPlayer();
-        Player killer = player.getKiller();
+    public void onPlayerDamage(EntityDamageByEntityEvent event) {
+        if (event.getEntity() instanceof Player) {
+            if (event.getDamager() instanceof Player) {
+                //damage caused by PvP
+                Player victim = ((Player) event.getEntity()).getPlayer();
+                Player killer = ((Player) event.getDamager()).getPlayer();
+                if (victim.getHealth() - event.getDamage() <= 0) {
+                    //Player is dead
+                    spectators.add(currentGame.getCompetitors().remove(currentGame.getCompetitors().indexOf(victim.getName())));
+                    setSpectatorMode();
+                    for (Player pl : Bukkit.getWorld(currentGame.getWorldUUID()).getPlayers()) {
+                        pl.sendMessage(ChatColor.RED + "[DEATH]" + ChatColor.BOLD + pl.getName() + " was killed by " + ChatColor.BOLD + killer.getName());
+                    }
+                }
+            }
+            event.setCancelled(true);
 
-        spectators.add(currentGame.getCompetitors().remove(currentGame.getCompetitors().indexOf(killer.getName())));
-        setSpectatorMode();
-        for (Player pl : player.getWorld().getPlayers()) {
-            pl.sendMessage(ChatColor.RED + "[DEATH]" + ChatColor.BOLD + player.getName() + " was killed by " + ChatColor.BOLD + killer.getName());
+            //if there is only one competitor left, set the gameEnder task
+            if(currentGame.getCompetitors().size()<=1) {
+                BukkitTask countDownTimer = new GameEnder(this.plugin, this.currentGame, 10).runTaskTimer(this.plugin, 0, 20);
+            }
         }
-        if(currentGame.getCompetitors().size()<=0) {
-            BukkitTask countDownTimer = new GameEnder(this.plugin, this.currentGame, 10).runTaskTimer(this.plugin, 0, 20);
+    }
+
+    @EventHandler
+    public void onPlayerDamage(EntityDamageEvent event) {
+        if (event.getEntity() instanceof Player) {
+            Player victim = ((Player) event.getEntity()).getPlayer();
+            if (victim.getHealth() - event.getDamage() <= 0) {
+                //Player is dead
+                spectators.add(currentGame.getCompetitors().remove(currentGame.getCompetitors().indexOf(victim.getName())));
+                setSpectatorMode();
+                for (Player pl : Bukkit.getWorld(currentGame.getWorldUUID()).getPlayers()) {
+                    pl.sendMessage(ChatColor.RED + "[DEATH]" + ChatColor.BOLD + pl.getName() + " was killed by " + ChatColor.BOLD + event.getCause().toString());
+                }
+            }
+            event.setCancelled(true);
+
+            //if there is only one competitor left, set the gameEnder task
+            if(currentGame.getCompetitors().size()<=1) {
+                BukkitTask countDownTimer = new GameEnder(this.plugin, this.currentGame, 10).runTaskTimer(this.plugin, 0, 20);
+            }
         }
     }
 
@@ -111,6 +144,7 @@ class GameEvents implements Listener {
             Player p = Bukkit.getPlayer(spectators.get(i));
             p.setGameMode(GameMode.ADVENTURE);
             p.setAllowFlight(true);
+            p.setCanPickupItems(false);
         }
     }
 
@@ -188,8 +222,7 @@ class GameEnder extends BukkitRunnable {
         this.currentGame = currentGame;
         this.countdown = countdown;
 
-        for(int i=0; i<currentGame.getCompetitors().size(); i++) {
-            Player p = Bukkit.getPlayer(currentGame.getCompetitors().get(i));
+        for(Player p: Bukkit.getWorld(currentGame.getWorldUUID()).getPlayers()) {
             p.sendMessage("The world will close in " + countdown + " seconds!");
         }
     }
@@ -198,9 +231,11 @@ class GameEnder extends BukkitRunnable {
     public void run() {
         countdown--;
         if(countdown<=0) {
-            for(int i=0; i<currentGame.getCompetitors().size(); i++) {
-                Player p = Bukkit.getPlayer(currentGame.getCompetitors().get(i));
+            for(Player p: Bukkit.getWorld(currentGame.getWorldUUID()).getPlayers()) {
                 p.sendMessage("Server Closing...");
+            }
+            for(Player p: Bukkit.getWorld(currentGame.getWorldUUID()).getPlayers()) {
+                p.teleport(new Location(Bukkit.getWorld(this.plugin.homeworld),0,0,0));
             }
             plugin.worldManager.destroyWorld(currentGame.getWorldUUID());
             this.cancel();

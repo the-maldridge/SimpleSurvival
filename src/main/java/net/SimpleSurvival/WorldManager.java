@@ -33,7 +33,12 @@ public class WorldManager {
 
     public void destroyWorld(String worldToDestroy) {
         //unload the world without saving, we are about to delete it anyway
-        this.plugin.getServer().unloadWorld(worldToDestroy,false);
+        if(this.plugin.getServer().unloadWorld(worldToDestroy,false)) {
+            this.plugin.getLogger().info("successfully unloaded world");
+        } else {
+            this.plugin.getLogger().severe("could not unload world");
+            this.plugin.getLogger().severe("the following players weren't removed from the world: " + Bukkit.getWorld(worldToDestroy).getEntities().toString());
+        }
         try {
             Path toDelete = Paths.get(this.plugin.getServer().getWorldContainer().getCanonicalPath(), worldToDestroy);
             Files.walkFileTree(toDelete, new DeletingFileVisitor(toDelete));
