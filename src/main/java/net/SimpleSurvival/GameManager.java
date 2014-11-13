@@ -5,6 +5,7 @@ import org.bukkit.block.Chest;
 import org.bukkit.block.DoubleChest;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -118,24 +119,28 @@ public class GameManager implements Listener {
     @EventHandler
     public void onPlayerDamage(EntityDamageByEntityEvent event) {
         if (event.getEntity().getWorld().getName() == worldUUID) {
-            if (event.getEntity() instanceof Player) {
-                if (event.getDamager() instanceof Player) {
-                    //damage caused by PvP
-                    Player victim = ((Player) event.getEntity()).getPlayer();
-                    Player killer = ((Player) event.getDamager()).getPlayer();
-                    if (victim.getHealth() - event.getDamage() <= 0) {
-                        //Player is dead
-                        event.setCancelled(true);
-                        competitors.remove(competitors.indexOf(victim.getName()));
-                        setSpectatorMode(victim.getName());
-                        for (Player pl : Bukkit.getWorld(worldUUID).getPlayers()) {
-                            pl.sendMessage(ChatColor.RED + "[DEATH]" + ChatColor.BOLD + victim.getName() + " was killed by " + ChatColor.BOLD + killer.getName());
+            if ((event.getEntity() instanceof Player)) {
+                if(competitors.contains(((Player)event.getEntity()).getPlayer().getName())) {
+                    if ((event.getDamager() instanceof Player) && (competitors.contains(((Player) event.getDamager()).getName()))) {
+                        //damage caused by PvP
+                        Player victim = ((Player) event.getEntity()).getPlayer();
+                        Player killer = ((Player) event.getDamager()).getPlayer();
+                        if (victim.getHealth() - event.getDamage() <= 0) {
+                            //Player is dead
+                            event.setCancelled(true);
+                            competitors.remove(competitors.indexOf(victim.getName()));
+                            setSpectatorMode(victim.getName());
+                            for (Player pl : Bukkit.getWorld(worldUUID).getPlayers()) {
+                                pl.sendMessage(ChatColor.RED + "[DEATH]" + ChatColor.BOLD + victim.getName() + " was killed by " + ChatColor.BOLD + killer.getName());
+                            }
                         }
                     }
-                }
-                //if there is only one competitor left, set the game state to finished
-                if (competitors.size() <= 1) {
-                    state = GameState.FINISHED;
+                    //if there is only one competitor left, set the game state to finished
+                    if (competitors.size() <= 1) {
+                        state = GameState.FINISHED;
+                    }
+                } else {
+                    event.setCancelled(true);
                 }
             }
         }
@@ -144,26 +149,27 @@ public class GameManager implements Listener {
     @EventHandler
     public void onPlayerDamage(EntityDamageEvent event) {
         if (event.getEntity().getWorld().getName() == worldUUID) {
-            if (event.getEntity() instanceof Player) {
-                Player victim = ((Player) event.getEntity()).getPlayer();
-                if (victim.getHealth() - event.getDamage() <= 0) {
-                    //Player is dead
-                    event.setCancelled(true);
-                    competitors.remove(victim.getName());
-                    setSpectatorMode(victim.getName());
-                    for (Player pl : Bukkit.getWorld(worldUUID).getPlayers()) {
-                        pl.sendMessage(ChatColor.RED + "[DEATH]" + ChatColor.BOLD + victim.getName() + " was killed by " + ChatColor.BOLD + event.getCause().toString());
+            if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
+                if (event.getEntity() instanceof Player) {
+                    Player victim = ((Player) event.getEntity()).getPlayer();
+                    if (victim.getHealth() - event.getDamage() <= 0) {
+                        //Player is dead
+                        event.setCancelled(true);
+                        competitors.remove(victim.getName());
+                        setSpectatorMode(victim.getName());
+                        for (Player pl : Bukkit.getWorld(worldUUID).getPlayers()) {
+                            pl.sendMessage(ChatColor.RED + "[DEATH]" + ChatColor.BOLD + victim.getName() + " was killed by " + ChatColor.BOLD + event.getCause().toString());
+                        }
                     }
-                }
 
-                //if there is only one competitor left, set the game state to finished
-                if (competitors.size() <= 1) {
-                    state = GameState.FINISHED;
+                    //if there is only one competitor left, set the game state to finished
+                    if (competitors.size() <= 1) {
+                        state = GameState.FINISHED;
+                    }
                 }
             }
         }
     }
-
     private void setSpectatorMode(String player) {
         Player p = Bukkit.getPlayer(player);
         p.setGameMode(GameMode.ADVENTURE);
