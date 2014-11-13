@@ -100,14 +100,16 @@ public class GameManager implements Listener {
 
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
-        if (competitors.contains(event.getPlayer().getName())) {
-            if (state != GameState.RUNNING) {
-                Vector to = event.getTo().toVector();
-                Vector from = event.getFrom().toVector();
-                Player player = event.getPlayer();
-                if (to.getX() != from.getX() || to.getZ() != from.getZ()) {
-                    player.teleport(event.getFrom());
-                    event.setCancelled(true);
+        if (event.getPlayer().getWorld().getName() == worldUUID) {
+            if (competitors.contains(event.getPlayer().getName())) {
+                if (state != GameState.RUNNING) {
+                    Vector to = event.getTo().toVector();
+                    Vector from = event.getFrom().toVector();
+                    Player player = event.getPlayer();
+                    if (to.getX() != from.getX() || to.getZ() != from.getZ()) {
+                        player.teleport(event.getFrom());
+                        event.setCancelled(true);
+                    }
                 }
             }
         }
@@ -250,6 +252,8 @@ class GameEnder extends BukkitRunnable {
                 p.sendMessage("Server Closing...");
             }
             for (Player p : Bukkit.getWorld(currentGame.getWorldUUID()).getPlayers()) {
+                p.setGameMode(GameMode.SURVIVAL);
+                p.setAllowFlight(false);
                 p.teleport(new Location(Bukkit.getServer().getWorlds().get(0), 0, 0, 0));
             }
             plugin.worldManager.destroyWorld(currentGame.getWorldUUID());
