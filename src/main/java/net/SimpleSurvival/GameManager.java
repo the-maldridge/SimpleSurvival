@@ -127,6 +127,7 @@ class GameEvents implements Listener {
             Player p = Bukkit.getPlayer(spectators.get(i));
             p.setGameMode(GameMode.ADVENTURE);
             p.setAllowFlight(true);
+            p.setCanPickupItems(false);
         }
     }
 
