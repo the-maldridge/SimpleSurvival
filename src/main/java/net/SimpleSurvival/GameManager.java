@@ -134,11 +134,13 @@ public class GameManager implements Listener {
                                 pl.sendMessage(ChatColor.RED + "[DEATH]" + ChatColor.BOLD + victim.getName() + " was killed by " + ChatColor.BOLD + killer.getName());
                             }
                         }
-                    }
-                    //if there is only one competitor left, set the game state to finished
-                    if (competitors.size() <= 1) {
-                        state = GameState.FINISHED;
-                    }
+						//if there is only one competitor left, set the game state to finished
+						if (competitors.size() <= 1) {
+							state = GameState.FINISHED;
+						}
+                    } else {
+						event.setCancelled(true);
+					}
                 } else {
                     event.setCancelled(true);
                 }
