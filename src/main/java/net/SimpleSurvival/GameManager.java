@@ -27,6 +27,7 @@ public class GameManager implements Listener {
     private final String worldUUID = UUID.randomUUID().toString();
     private final SimpleSurvival plugin;
     ArrayList<String> spectators = new ArrayList<String>();
+    public enum GameState {BEFORE_GAME, STARTING, RUNNING, PAUSED, FINISHED}
     private GameState state = GameState.BEFORE_GAME;
     private ArrayList<InventoryHolder> openedChests = new ArrayList<InventoryHolder>();
     private GameTemplate staticSettings;
@@ -86,11 +87,15 @@ public class GameManager implements Listener {
         }
 
         if(state == GameState.BEFORE_GAME) {
-            new GameStarter(this.plugin, 15).runTaskTimer(this.plugin, 0, 20);
+            new GameStarter(this.plugin, this, 15).runTaskTimer(this.plugin, 0, 20);
             state = GameState.STARTING;
         }
 
         return true;
+    }
+
+    public void end() {
+        BukkitTask countDownTimer = new GameEnder(this.plugin, this, 10).runTaskTimer(this.plugin, 0, 20);
     }
 
     @EventHandler
@@ -126,9 +131,9 @@ public class GameManager implements Listener {
             }
             event.setCancelled(true);
 
-            //if there is only one competitor left, set the gameEnder task
+            //if there is only one competitor left, set the game state to finished
             if (competitors.size() <= 1) {
-                BukkitTask countDownTimer = new GameEnder(this.plugin, this, 10).runTaskTimer(this.plugin, 0, 20);
+                state = GameState.FINISHED;
             }
         }
     }
@@ -146,9 +151,9 @@ public class GameManager implements Listener {
             }
             event.setCancelled(true);
 
-            //if there is only one competitor left, set the gameEnder task
+            //if there is only one competitor left, set the game state to finished
             if (competitors.size() <= 1) {
-                BukkitTask countDownTimer = new GameEnder(this.plugin, this, 10).runTaskTimer(this.plugin, 0, 20);
+                state = GameState.FINISHED;
             }
         }
     }
@@ -191,8 +196,6 @@ public class GameManager implements Listener {
             System.out.println("not a chest");
         }
     }
-
-    public enum GameState {BEFORE_GAME, STARTING, RUNNING, PAUSED, FINISHED}
 }
 
 class GameStarter extends BukkitRunnable {
@@ -201,8 +204,9 @@ class GameStarter extends BukkitRunnable {
     private GameManager currentGame;
     private int countdown;
 
-    public GameStarter(SimpleSurvival plugin, int countdown) {
+    public GameStarter(SimpleSurvival plugin, GameManager currentGame, int countdown) {
         this.plugin = plugin;
+        this.currentGame = currentGame;
         this.countdown = countdown;
     }
 
@@ -233,7 +237,7 @@ class GameEnder extends BukkitRunnable {
         this.currentGame = currentGame;
         this.countdown = countdown;
 
-        for (Player p : Bukkit.getWorld(this.currentGame.getWorldUUID()).getPlayers()) {
+        for (Player p : Bukkit.getWorld(currentGame.getWorldUUID()).getPlayers()) {
             p.sendMessage("The world will close in " + countdown + " seconds!");
         }
     }
@@ -246,7 +250,7 @@ class GameEnder extends BukkitRunnable {
                 p.sendMessage("Server Closing...");
             }
             for (Player p : Bukkit.getWorld(currentGame.getWorldUUID()).getPlayers()) {
-                p.teleport(new Location(Bukkit.getWorld("world"), 0, 0, 0));
+                p.teleport(new Location(Bukkit.getServer().getWorlds().get(0), 0, 0, 0));
             }
             plugin.worldManager.destroyWorld(currentGame.getWorldUUID());
             this.cancel();
