@@ -289,9 +289,9 @@ class GameEnder extends BukkitRunnable {
             }
 
             plugin.worldManager.destroyWorld(currentGame.getWorldUUID());
+			currentGame.unregisterListeners();
             this.cancel();
         }
 
-		currentGame.unregisterListeners();
     }
 }
