@@ -169,6 +169,9 @@ public class GameManager implements Listener {
         p.setGameMode(GameMode.ADVENTURE);
         p.setAllowFlight(true);
         p.setCanPickupItems(false);
+        for(Player pl : p.getWorld().getPlayers()) {
+            pl.hidePlayer(p);
+        }
     }
 
     @EventHandler
@@ -268,6 +271,10 @@ class GameEnder extends BukkitRunnable {
                 p.setGameMode(GameMode.SURVIVAL);
                 p.setAllowFlight(false);
                 p.teleport(new Location(Bukkit.getServer().getWorlds().get(0), 0, 0, 0));
+                p.getInventory().clear();
+                for(Player player : Bukkit.getWorld(currentGame.getWorldUUID()).getPlayers()) {
+                    p.showPlayer(player);
+                }
             }
             plugin.worldManager.destroyWorld(currentGame.getWorldUUID());
             this.cancel();
