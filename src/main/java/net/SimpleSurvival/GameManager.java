@@ -192,6 +192,13 @@ public class GameManager implements Listener {
         }
     }
 
+	public void unregisterListeners() {
+		PlayerMoveEvent.getHandlerList().unregister(this);
+		EntityDamageEvent.getHandlerList().unregister(this);
+		EntityDamageByEntityEvent.getHandlerList().unregister(this);
+		InventoryOpenEvent.getHandlerList().unregister(this);
+	}
+
     public enum GameState {BEFORE_GAME, STARTING, RUNNING, PAUSED, FINISHED}
 }
 
@@ -232,6 +239,8 @@ class GameEnder extends BukkitRunnable {
         this.plugin = plugin;
         this.currentGame = currentGame;
         this.countdown = countdown;
+
+		currentGame.unregisterListeners();
 
         for (Player p : Bukkit.getWorld(this.currentGame.getWorldUUID()).getPlayers()) {
             p.sendMessage("The world will close in " + countdown + " seconds!");
