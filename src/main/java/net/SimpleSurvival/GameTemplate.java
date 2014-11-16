@@ -61,7 +61,7 @@ public class GameTemplate {
             String[] xyzStr = point.split(",");
             Integer[] xyz = new Integer[3];
             for(int i = 0; i < 3; ++i) {
-                System.out.println("Parsing XYZ: " + xyzStr[i].trim());
+                plugin.getLogger().fine("Parsing XYZ spawn for " + sourceWorld + ": " + xyzStr[i].trim());
                 xyz[i] = Integer.parseInt(xyzStr[i].trim());
             }
             this.spawns.add(xyz);
@@ -72,7 +72,7 @@ public class GameTemplate {
         this.loot = new HashMap<>();
         for(Map<?, ?> map: lootMaps) {
 			for(Object key: map.keySet()) {
-				System.out.println("Found loot " + (String)key);
+				plugin.getLogger().fine("Loading loot for " + sourceWorld + ": " + (String)key);
 				this.loot.put(Material.getMaterial((String)key), (Double)map.get(key));
 			}
         }
@@ -112,27 +112,4 @@ public class GameTemplate {
         this.competitors = new ArrayList<>();
         return val;
     }
-    //TODO write back to the disk
-    public boolean addSpawn(Location loc) {
-        Integer[] currentLoc = new Integer[3];
-        currentLoc[0] = (int)loc.getX();
-        currentLoc[1] = (int)loc.getY();
-        currentLoc[2] = (int)loc.getZ();
-
-        spawns.add(currentLoc);
-
-        return true;
-    }
-
-    public boolean setSpawn(int index, Location loc) {
-        Integer[] currentLoc = new Integer[3];
-        currentLoc[0] = (int)loc.getX();
-        currentLoc[1] = (int)loc.getY();
-        currentLoc[2] = (int)loc.getZ();
-
-        spawns.set(index, currentLoc);
-
-        return true;
-    }
-
 }

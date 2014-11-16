@@ -39,7 +39,7 @@ public class GameManager implements Listener {
         this.plugin = plugin;
         this.staticSettings = staticSettings;
         this.competitors = competitors;
-        this.plugin.getLogger().info("Players given to us " + competitors.toString());
+        this.plugin.getLogger().info("Warping the following players to  " + this.staticSettings.getSourceWorld() + ": "+ competitors.toString());
         this.plugin.getServer().getPluginManager().registerEvents(this, this.plugin);
     }
 
@@ -207,26 +207,16 @@ public class GameManager implements Listener {
                 if (spectators.contains(player)) {
                     inventoryOpenEvent.setCancelled(true);
                     return;
-                } else {
-                    System.out.println("player check passed");
                 }
 
                 if (!openedChests.contains(holder)) {
                     openedChests.add(holder);
                     for (Map.Entry<Material, Double> lootEntry : staticSettings.getLoot().entrySet()) {
-                        System.out.println("Checking loot entry " + lootEntry.toString());
                         if (Math.random() * 100 < lootEntry.getValue()) {
-                            System.out.println("lootchance passed");
                             inventory.addItem(new ItemStack(lootEntry.getKey()));
-                        } else {
-                            System.out.println("insufficient loot chance");
                         }
                     }
-                } else {
-                    System.out.println("seen this chest before");
                 }
-            } else {
-                System.out.println("not a chest");
             }
         }
     }

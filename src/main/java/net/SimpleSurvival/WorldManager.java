@@ -20,8 +20,6 @@ public class WorldManager {
     public void newWorldFromTemplate(String template, String newName) {
         boolean errors = false;
         try {
-            //TODO figure out why this doesn't actually copy the world
-            // NOTE: it has an IOException after the player is registered into a game and the SimpleSurvival instance attempts to copy the world template over into the worlds directory
             System.out.println(this.plugin.getDataFolder().getCanonicalPath() + ":" + template);
             Path source = Paths.get(this.plugin.getDataFolder().getCanonicalPath(), template);
             Files.walkFileTree(source, new CopyFileVisitor(source, Paths.get(Bukkit.getWorldContainer().getCanonicalPath(), newName)));
@@ -58,7 +56,6 @@ public class WorldManager {
         @Override
         public FileVisitResult visitFile(Path file, BasicFileAttributes attributes) throws IOException {
             if(attributes.isRegularFile()){
-                System.out.println("Deleting Regular File: " + file.getFileName());
                 Files.delete(file);
             }
             return FileVisitResult.CONTINUE;
@@ -66,14 +63,12 @@ public class WorldManager {
 
         @Override
         public FileVisitResult postVisitDirectory(Path directory, IOException ioe) throws IOException {
-            System.out.println("Deleting Directory: " + directory.getFileName());
             Files.delete(directory);
             return FileVisitResult.CONTINUE;
         }
 
         @Override
         public FileVisitResult visitFileFailed(Path file, IOException ioe) throws IOException {
-            System.out.println("Something went wrong while working on : " + file.getFileName());
             ioe.printStackTrace();
             return FileVisitResult.CONTINUE;
         }

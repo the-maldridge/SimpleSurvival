@@ -59,9 +59,8 @@ public class SimpleSurvival extends JavaPlugin {
             SimpleSurvival plugin = SimpleSurvival.this;
             @Override
             public void run() {
-                for (GameTemplate game : this.plugin.gameTemplates.values()) {
-                    if (game.isReady()) {
-                        // FIXME: Btw I changed this maldridge, look at it because I'm going to forget
+                for(GameTemplate game : this.plugin.gameTemplates.values()) {
+                    if(game.isReady()) {
                         // Get the settings for the world
                         GameManager manager = game.createGame(this.plugin);
                         // Copy the world data into the running worlds
@@ -71,7 +70,6 @@ public class SimpleSurvival extends JavaPlugin {
                         // Send the players there
                         manager.sendPlayersToSpawn();
                         // Add the world to the running games
-                        System.out.println("world loaded, about to start");
                         this.plugin.runningGames.add(manager);
                     }
                 }
@@ -89,7 +87,7 @@ public class SimpleSurvival extends JavaPlugin {
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		String cmdName = cmd.getName();
-		if(cmdName.equalsIgnoreCase("survival")) {
+		if (cmdName.equalsIgnoreCase("survival")) {
 			// Add the player to the list for the game they are attempting to enter
 			if (!(sender instanceof Player)) {
 				sender.sendMessage("It is assumed that only Players may register for a game");
@@ -105,9 +103,9 @@ public class SimpleSurvival extends JavaPlugin {
 
 			boolean isRegistering;
 
-			if(args[0].equalsIgnoreCase("register")) {
+			if (args[0].equalsIgnoreCase("register")) {
 				isRegistering = true;
-			} else if(args[0].equalsIgnoreCase("unregister")) {
+			} else if (args[0].equalsIgnoreCase("unregister")) {
 				isRegistering = false;
 			} else {
 				return false;
@@ -122,7 +120,7 @@ public class SimpleSurvival extends JavaPlugin {
 
 			GameTemplate game = gameTemplates.get(gameName);
 
-			if(isRegistering) {
+			if (isRegistering) {
 				if (game.hasCompetitor(player)) {
 					sender.sendMessage("You are already registered for that game");
 					return true;
@@ -135,10 +133,10 @@ public class SimpleSurvival extends JavaPlugin {
 					}
 				}
 
-                if(game.isFull()) {
-                    sender.sendMessage("That game is full");
-                    return true;
-                }
+				if (game.isFull()) {
+					sender.sendMessage("That game is full");
+					return true;
+				}
 
 				// Finally, there are no problems, so we can add the player to the list
 				game.addCompetitor(player);
@@ -154,51 +152,8 @@ public class SimpleSurvival extends JavaPlugin {
 				sender.sendMessage("Successfully unregistered");
 				return true;
 			}
-		} else if(cmdName.equalsIgnoreCase("addSpawn")) {
-			// TODO: Add permission check
-			return addSpawn((Player)sender);
-		} else if(cmdName.equalsIgnoreCase("changeSpawn")) {
-			// TODO: Add permission check
-			if (args.length != 1) return false;
-			return setSpawn((Player)sender, args[0]);
 		}
+		//if we've made it here no command handler could fire
 		return false;
-	}
-
-	private boolean addSpawn(Player player) {
-		String worldName = player.getLocation().getWorld().getName();
-		boolean success = gameTemplates.get(worldName).addSpawn(player.getLocation());
-		if(success) {
-			player.sendMessage("Successfully added spawn.");
-		}
-		return success;
-	}
-
-	private boolean setSpawn(Player player, String arg) {
-		String worldName = player.getLocation().getWorld().getName();
-		int spawnNum;
-		try {
-			spawnNum = Integer.valueOf(arg);
-			--spawnNum;
-		} catch(NumberFormatException e) {
-			return false;
-		}
-
-		if(gameTemplates.containsKey(worldName)) {
-			GameTemplate game = gameTemplates.get(worldName);
-			if(spawnNum < game.getSpawns().size()) {
-				boolean success = game.setSpawn(spawnNum, player.getLocation());
-				if(success) {
-					player.sendMessage("Spawn " + (spawnNum + 1) + " successfully changed.");
-				}
-				return success;
-			} else {
-				player.sendMessage("Not enough spawn points already exist.");
-				return true;
-			}
-		} else {
-			player.sendMessage("World settings do not exist.");
-			return true;
-		}
 	}
 }
