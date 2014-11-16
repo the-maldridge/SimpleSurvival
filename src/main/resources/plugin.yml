@@ -20,3 +20,7 @@ commands:
     description: manually start a game
     usage: "Usage: /start <game>"
     permission: gamemaster
+  endall:
+    description: end all games, queued and running"
+    usage: "Usage: /endall"
+    permission: gamemaster

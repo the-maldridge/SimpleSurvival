@@ -85,6 +85,26 @@ public class SimpleSurvival extends JavaPlugin {
 		}, 0L, 200L);
 	}
 
+	@Override
+	public void onDisable() {
+		endAllGames();
+	}
+
+	public void endAllGames() {
+		for(GameManager game: runningGames) {
+			game.end();
+		}
+		runningGames.clear();
+		for(GameManager game: warpable) {
+			game.end();
+		}
+		warpable.clear();
+		for(GameManager game: startable) {
+			game.end();
+		}
+		startable.clear();
+	}
+
 	@EventHandler
 	public void onPlayerQuit(PlayerQuitEvent evt) {
 		// Make sure players are not registered for events that haven't fired
@@ -202,6 +222,9 @@ public class SimpleSurvival extends JavaPlugin {
 			} else {
 				return false;
 			}
+		} else if(cmdName.equalsIgnoreCase("endall")) {
+			endAllGames();
+			return true;
 		}
 		//if we've made it here no command handler could fire
 		return false;
