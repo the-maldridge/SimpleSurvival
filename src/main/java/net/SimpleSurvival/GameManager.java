@@ -64,7 +64,7 @@ public class GameManager implements Listener {
     }
 
     @Override
-    public String toString() {return this.getWorld();}
+    public String toString() {return this.getWorld()+"-"+this.getWorldUUID().substring(0,4);}
     public String getWorld() {
         return staticSettings.getSourceWorld();
     }

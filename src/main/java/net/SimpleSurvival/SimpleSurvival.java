@@ -70,7 +70,7 @@ public class SimpleSurvival extends JavaPlugin {
 							this.plugin.runningGames.add(manager);
 
 						} else {
-							this.plugin.getLogger().info(manager.getWorld() + " ready for manual warp");
+							this.plugin.getLogger().info(manager.toString() + " ready for manual warp");
 							this.plugin.warpable.add(manager);
 						}
 					}
@@ -170,7 +170,7 @@ public class SimpleSurvival extends JavaPlugin {
 				sender.sendMessage("Warpable games: " + warpable.toString());
 			} else if (args.length == 1) {
 				for (GameManager game : warpable) {
-					if (game.getWorld().equalsIgnoreCase(args[0])) {
+					if ((game.getWorld()+"-"+game.getWorldUUID().substring(0,4)).equalsIgnoreCase(args[0])) {
 						game.sendPlayersToSpawn();
 						warpable.remove(game);
 						if(game.doAutoStart()) {
@@ -191,7 +191,7 @@ public class SimpleSurvival extends JavaPlugin {
 				sender.sendMessage("Startable games: " + startable.toString());
 			} else if (args.length == 1) {
 				for (GameManager game : startable) {
-					if (game.getWorld().equalsIgnoreCase(args[0])) {
+					if ((game.getWorld()+"-"+game.getWorldUUID().substring(0,4)).equalsIgnoreCase(args[0])) {
 						game.start();
 						startable.remove(game);
 						runningGames.add(game);
