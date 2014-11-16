@@ -101,6 +101,20 @@ public class GameManager implements Listener {
         BukkitTask countDownTimer = new GameEnder(this.plugin, this, 10).runTaskTimer(this.plugin, 0, 20);
     }
 
+    public void announceWinner() {
+        for(Player p: Bukkit.getWorld(worldUUID).getPlayers()) {
+            if(competitors.size()>0) {
+                p.sendMessage(competitors.get(0) + " has won the round!");
+            }
+        }
+        if(competitors.size()>0) {
+            this.plugin.getLogger().info(competitors.get(0) + " has won the round.");
+        } else {
+            this.plugin.getLogger().info("A serious error has occurred, winners list of size 0: " + competitors.toString());
+        }
+    }
+
+
     private void dropPlayerInventory(Player player) {
         for (ItemStack i : player.getInventory().getContents()) {
             if (i != null) {
@@ -176,6 +190,7 @@ public class GameManager implements Listener {
                             }
                             //if there is only one competitor left, set the game state to finished
                             if (competitors.size() <= 1) {
+                                announceWinner();
                                 state = GameState.FINISHED;
                             }
                         }
@@ -207,6 +222,7 @@ public class GameManager implements Listener {
                         }
                         //if there is only one competitor left, set the game state to finished
                         if (competitors.size() <= 1) {
+                            announceWinner();
                             state = GameState.FINISHED;
                         }
                     }
