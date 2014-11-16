@@ -63,6 +63,8 @@ public class GameManager implements Listener {
         this.state = state;
     }
 
+    @Override
+    public String toString() {return this.getWorld();}
     public String getWorld() {
         return staticSettings.getSourceWorld();
     }
@@ -73,8 +75,10 @@ public class GameManager implements Listener {
 
     public boolean doAnimals() { return staticSettings.doAnimals(); }
     public boolean doHostileMobs() { return staticSettings.doHostileMobs(); }
+    public boolean doAutoWarp() { return staticSettings.doAutoWarp(); }
+    public boolean doAutoStart() { return staticSettings.doAutoStart(); }
 
-    public boolean sendPlayersToSpawn() {
+    public void sendPlayersToSpawn() {
         for (int i = 0; i < competitors.size(); i++) {
             int x = staticSettings.getSpawns().get(i)[0];
             int y = staticSettings.getSpawns().get(i)[1];
@@ -85,14 +89,14 @@ public class GameManager implements Listener {
             player.teleport(nextSpawn);
             setCompetitorMode(player);
         }
+    }
 
+    public void start() {
         if(state == GameState.BEFORE_GAME) {
             new GameStarter(this.plugin, this, 15).runTaskTimer(this.plugin, 0, 20);
             state = GameState.STARTING;
         }
-        return true;
     }
-
     public void end() {
         BukkitTask countDownTimer = new GameEnder(this.plugin, this, 10).runTaskTimer(this.plugin, 0, 20);
     }
@@ -299,7 +303,7 @@ class GameEnder extends BukkitRunnable {
         countdown--;
         if (countdown <= 0) {
             for (Player p : Bukkit.getWorld(currentGame.getWorldUUID()).getPlayers()) {
-                p.sendMessage("Server Closing...");
+                p.sendMessage("World Closing...");
             }
             for (Player p : Bukkit.getWorld(currentGame.getWorldUUID()).getPlayers()) {
                 p.setGameMode(GameMode.SURVIVAL);

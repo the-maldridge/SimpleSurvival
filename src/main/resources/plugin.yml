@@ -12,3 +12,11 @@ commands:
     description: register or unregister from a game
     usage: "Usage: /survival <register|unregister> <gameID>"
     permission: gamemaster
+  warp:
+    description: manually warp players to a game
+    usage: "Usage: /warp <game>"
+    permission: gamemaster
+  start:
+    description: manually start a game
+    usage: "Usage: /start <game>"
+    permission: gamemaster

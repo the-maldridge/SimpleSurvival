@@ -23,6 +23,8 @@ public class GameTemplate {
     private  List<Material> breakables;
     private boolean allowHostileMobs;
     private boolean allowAnimals;
+    private boolean autoStart;
+    private boolean autoWarp;
 
 
 
@@ -62,6 +64,8 @@ public class GameTemplate {
 
         allowHostileMobs = plugin.getConfig().getBoolean("worlds." + sourceWorld + ".mobs");
         allowAnimals = plugin.getConfig().getBoolean("worlds." + sourceWorld + ".animals");
+        autoStart = plugin.getConfig().getBoolean("worlds." + sourceWorld + ".autoStart");
+        autoWarp = plugin.getConfig().getBoolean("worlds." + sourceWorld + ".autoWarp");
     }
     public GameManager createGame(SimpleSurvival plugin) {
         // Spins off a new GameSettings from GameTemplate to represent a running game
@@ -81,6 +85,8 @@ public class GameTemplate {
     }
     public boolean doHostileMobs() { return allowHostileMobs; }
     public boolean doAnimals() { return allowAnimals; }
+    public boolean doAutoStart() { return autoStart; }
+    public boolean doAutoWarp() { return autoStart; }
 
     public List<Integer[]> getSpawns() {
         return spawns;

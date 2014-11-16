@@ -25,20 +25,23 @@ public class SimpleSurvival extends JavaPlugin {
 	// Map of games on particular worlds; Contains information about running/waiting games
 	// TODO: Save game settings and load them in a useful manner
 	// TODO: Remove players from the list of competitors when they disconnect
-    // The keys of this hashmap are the source names
+	// The keys of this hashmap are the source names
 	HashMap<String, GameTemplate> gameTemplates = new HashMap<String, GameTemplate>();
-    ArrayList<GameManager> runningGames = new ArrayList<>();
-    WorldManager worldManager = new WorldManager(this);
+	ArrayList<GameManager> runningGames = new ArrayList<>();
+	ArrayList<GameManager> warpable = new ArrayList<>();
+	ArrayList<GameManager> startable = new ArrayList<>();
 
-    public SimpleSurvival() {
-        String[] worlds = this.getDataFolder().list();
-        for(String world: worlds) {
-            if ((new File(this.getDataFolder(), world).isDirectory())) {
-                this.getLogger().info("Found template world " + world);
-                gameTemplates.put(world, new GameTemplate(this, world, world));
-            }
-        }
-    }
+	WorldManager worldManager = new WorldManager(this);
+
+	public SimpleSurvival() {
+		String[] worlds = this.getDataFolder().list();
+		for (String world : worlds) {
+			if ((new File(this.getDataFolder(), world).isDirectory())) {
+				this.getLogger().info("Found template world " + world);
+				gameTemplates.put(world, new GameTemplate(this, world, world));
+			}
+		}
+	}
 
 	@Override
 	public void onEnable() {
@@ -46,23 +49,35 @@ public class SimpleSurvival extends JavaPlugin {
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 		scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
 			SimpleSurvival plugin = SimpleSurvival.this;
+
 			@Override
 			public void run() {
-				for(GameTemplate game : this.plugin.gameTemplates.values()) {
-					if(game.isReady()) {
+				for (GameTemplate game : this.plugin.gameTemplates.values()) {
+					if (game.isReady()) {
 						// Get the settings for the world
 						GameManager manager = game.createGame(this.plugin);
 						// Copy the world data into the running worlds
 						this.plugin.worldManager.newWorldFromTemplate(manager);
 						// Send the players there
-						manager.sendPlayersToSpawn();
-						// Add the world to the running games
-						this.plugin.runningGames.add(manager);
+						if (manager.doAutoWarp()) {
+							manager.sendPlayersToSpawn();
+							// start the game
+							if (manager.doAutoStart()) {
+								manager.start();
+							} else {
+								this.plugin.startable.add(manager);
+							}
+							this.plugin.runningGames.add(manager);
+
+						} else {
+							this.plugin.getLogger().info(manager.getWorld() + " ready for manual warp");
+							this.plugin.warpable.add(manager);
+						}
 					}
 				}
 
-				for(int i=0; i<this.plugin.runningGames.size(); i++) {
-					if(this.plugin.runningGames.get(i).getState() == GameManager.GameState.FINISHED) {
+				for (int i = 0; i < this.plugin.runningGames.size(); i++) {
+					if (this.plugin.runningGames.get(i).getState() == GameManager.GameState.FINISHED) {
 						this.plugin.runningGames.remove(i--).end();
 					}
 				}
@@ -75,8 +90,8 @@ public class SimpleSurvival extends JavaPlugin {
 		// Make sure players are not registered for events that haven't fired
 		String player = evt.getPlayer().getName();
 
-		for(GameTemplate game: gameTemplates.values()) {
-			if(game.hasCompetitor(player)) {
+		for (GameTemplate game : gameTemplates.values()) {
+			if (game.hasCompetitor(player)) {
 				game.removeCompetitor(player);
 			}
 		}
@@ -149,6 +164,43 @@ public class SimpleSurvival extends JavaPlugin {
 				game.removeCompetitor(player);
 				sender.sendMessage("Successfully unregistered");
 				return true;
+			}
+		} else if (cmdName.equalsIgnoreCase("warp")) {
+			if (args.length == 0) {
+				sender.sendMessage("Warpable games: " + warpable.toString());
+			} else if (args.length == 1) {
+				for (GameManager game : warpable) {
+					if (game.getWorld().equalsIgnoreCase(args[0])) {
+						game.sendPlayersToSpawn();
+						warpable.remove(game);
+						if(game.doAutoStart()) {
+							runningGames.add(game);
+						} else {
+							startable.add(game);
+						}
+						return true;
+					}
+				}
+				sender.sendMessage("The game you entered wasn't found.");
+				return true;
+			} else {
+				return false;
+			}
+		} else if (cmdName.equalsIgnoreCase("start")) {
+			if (args.length == 0) {
+				sender.sendMessage("Startable games: " + startable.toString());
+			} else if (args.length == 1) {
+				for (GameManager game : startable) {
+					if (game.getWorld().equalsIgnoreCase(args[0])) {
+						game.start();
+						startable.remove(game);
+						runningGames.add(game);
+						return true;
+					}
+				}
+				sender.sendMessage("The game you entered wasn't startable.");
+			} else {
+				return false;
 			}
 		}
 		//if we've made it here no command handler could fire
