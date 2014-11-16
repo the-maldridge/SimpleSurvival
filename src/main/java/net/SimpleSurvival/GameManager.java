@@ -11,6 +11,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
@@ -232,6 +233,13 @@ public class GameManager implements Listener {
     public void onBlockBreak(BlockBreakEvent breakEvent) {
         if(!this.staticSettings.getBreakables().contains(breakEvent.getBlock())) {
             breakEvent.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onItemPickup(PlayerPickupItemEvent event) {
+        if(!competitors.contains(event.getPlayer().getName())) {
+            event.setCancelled(true);
         }
     }
 
