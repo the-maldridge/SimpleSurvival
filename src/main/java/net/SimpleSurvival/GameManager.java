@@ -80,19 +80,13 @@ public class GameManager implements Listener {
             Location nextSpawn = new Location(w, x, y, z);
             Player player = Bukkit.getPlayer(competitors.get(i));
             player.teleport(nextSpawn);
-            player.setAllowFlight(false);
-            player.setGameMode(GameMode.SURVIVAL);
-            player.setFoodLevel(20);
-            player.setHealth(20);
-            player.setLevel(0);
-            player.getInventory().clear();
+            setCompetitorMode(player);
         }
 
         if(state == GameState.BEFORE_GAME) {
             new GameStarter(this.plugin, this, 15).runTaskTimer(this.plugin, 0, 20);
             state = GameState.STARTING;
         }
-
         return true;
     }
 
@@ -119,6 +113,14 @@ public class GameManager implements Listener {
         for(Player pl : p.getWorld().getPlayers()) {
             pl.hidePlayer(p);
         }
+    }
+    private void setCompetitorMode(Player player) {
+        player.setAllowFlight(false);
+        player.setGameMode(GameMode.SURVIVAL);
+        player.setFoodLevel(20);
+        player.setHealth(20);
+        player.setLevel(0);
+        player.getInventory().clear();
     }
 
     public void unregisterListeners() {
