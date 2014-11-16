@@ -79,7 +79,7 @@ public class GameManager implements Listener {
     public boolean doAutoStart() { return staticSettings.doAutoStart(); }
 
     public void sendPlayersToSpawn() {
-        for (int i = 0; i < competitors.size(); i++) {
+        for (int i = 0; i < competitors.size(); i=i+(int)Math.floor((staticSettings.getSpawns().size()/competitors.size()))) {
             int x = staticSettings.getSpawns().get(i)[0];
             int y = staticSettings.getSpawns().get(i)[1];
             int z = staticSettings.getSpawns().get(i)[2];
