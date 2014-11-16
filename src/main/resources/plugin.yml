@@ -6,20 +6,8 @@ permissions:
   gamemaster.*:
     description: The admin of the survival game.
     default: op
-    children:
-      gamemaster.spawn: true
-  gamemaster.spawn:
-    description: Allows you to manage spawn points.
 
 commands:
-  changespawn:
-    description: Add the designated spawn point
-    usage: "Usage: /<command> [spawnNum]"
-    permission: gamemaster
-  addspawn:
-    description: Add the next spawn point
-    usage: "Usage: /<command>"
-    permission: gamemaster
   survival:
     description: register or unregister from a game
     usage: "Usage: /survival <register|unregister> <gameID>"
