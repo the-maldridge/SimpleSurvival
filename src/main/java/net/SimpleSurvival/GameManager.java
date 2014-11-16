@@ -80,9 +80,9 @@ public class GameManager implements Listener {
 
     public void sendPlayersToSpawn() {
         for (int i = 0; i < competitors.size(); i=i+(int)Math.floor((staticSettings.getSpawns().size()/competitors.size()))) {
-            int x = staticSettings.getSpawns().get(i)[0];
-            int y = staticSettings.getSpawns().get(i)[1];
-            int z = staticSettings.getSpawns().get(i)[2];
+            double x = staticSettings.getSpawns().get(i)[0]+0.5;
+            double y = staticSettings.getSpawns().get(i)[1]+0.5;
+            double z = staticSettings.getSpawns().get(i)[2]+0.5;
             World w = Bukkit.getWorld(worldUUID);
             Location nextSpawn = new Location(w, x, y, z);
             Player player = Bukkit.getPlayer(competitors.get(i));
