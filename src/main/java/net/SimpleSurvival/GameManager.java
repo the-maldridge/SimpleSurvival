@@ -130,6 +130,7 @@ public class GameManager implements Listener {
                             event.setCancelled(true);
                             competitors.remove(competitors.indexOf(victim.getName()));
                             setSpectatorMode(victim.getName());
+                            dropPlayerInventory(victim);
                             for (Player pl : Bukkit.getWorld(worldUUID).getPlayers()) {
                                 pl.sendMessage(ChatColor.RED + "[DEATH]" + ChatColor.BOLD + victim.getName() + " was killed by " + ChatColor.BOLD + killer.getName());
                             }
@@ -158,6 +159,7 @@ public class GameManager implements Listener {
                         //Player is dead
                         event.setCancelled(true);
                         competitors.remove(victim.getName());
+                        dropPlayerInventory(victim);
                         setSpectatorMode(victim.getName());
                         for (Player pl : Bukkit.getWorld(worldUUID).getPlayers()) {
                             pl.sendMessage(ChatColor.RED + "[DEATH]" + ChatColor.BOLD + victim.getName() + " was killed by " + ChatColor.BOLD + event.getCause().toString());
@@ -172,6 +174,16 @@ public class GameManager implements Listener {
             }
         }
     }
+
+    private void dropPlayerInventory(Player player) {
+        for (ItemStack i : player.getInventory().getContents()) {
+            if (i != null) {
+                player.getWorld().dropItemNaturally(player.getLocation(), i);
+                player.getInventory().remove(i);
+            }
+        }
+    }
+
     private void setSpectatorMode(String player) {
         Player p = Bukkit.getPlayer(player);
         p.setGameMode(GameMode.ADVENTURE);
