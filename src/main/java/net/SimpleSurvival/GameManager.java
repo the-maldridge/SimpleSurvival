@@ -251,6 +251,7 @@ public class GameManager implements Listener {
 		EntityDamageByEntityEvent.getHandlerList().unregister(this);
 		InventoryOpenEvent.getHandlerList().unregister(this);
         BlockBreakEvent.getHandlerList().unregister(this);
+        PlayerPickupItemEvent.getHandlerList().unregister(this);
 	}
 }
 
