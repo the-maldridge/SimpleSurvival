@@ -3,6 +3,7 @@ package net.SimpleSurvival;
 import org.bukkit.Bukkit;
 import org.bukkit.WorldCreator;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.entity.Player;
@@ -11,6 +12,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.scheduler.BukkitScheduler;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -30,6 +32,7 @@ public class SimpleSurvival extends JavaPlugin {
 	ArrayList<GameManager> runningGames = new ArrayList<>();
 	ArrayList<GameManager> warpable = new ArrayList<>();
 	ArrayList<GameManager> startable = new ArrayList<>();
+	ArrayList<int[]> spawns = new ArrayList<int[]>();
 
 	WorldManager worldManager = new WorldManager(this);
 
@@ -78,7 +81,7 @@ public class SimpleSurvival extends JavaPlugin {
 
 				for (int i = 0; i < this.plugin.runningGames.size(); i++) {
 					if (this.plugin.runningGames.get(i).getState() == GameManager.GameState.FINISHED) {
-						this.plugin.runningGames.remove(i--).end();
+						this.plugin.runningGames.remove(i--).end(false);
 					}
 				}
 			}
@@ -92,19 +95,42 @@ public class SimpleSurvival extends JavaPlugin {
 
 	public void endAllGames() {
 		for(GameManager game: runningGames) {
-			game.end();
+			game.end(true);
 		}
 		runningGames.clear();
 		for(GameManager game: warpable) {
-			game.end();
+			game.end(true);
 		}
 		warpable.clear();
 		for(GameManager game: startable) {
-			game.end();
+			game.end(true);
 		}
 		startable.clear();
 	}
+	public void addSpawn(Player player) {
+		int[] loc = new int[3];
+		loc[0] = (int)player.getLocation().getX();
+		loc[1] = (int)player.getLocation().getY();
+		loc[2] = (int)player.getLocation().getZ();
+		spawns.add(loc);
+	}
 
+	public void dumpSpawns(Player player) {
+		for(int[] loc: spawns) {
+			player.sendMessage("- "+loc[0]+","+loc[1]+","+loc[2]);
+		}
+
+		ArrayList<String> spawnString = new ArrayList<>();
+		for(int[] loc: spawns) {
+			spawnString.add(loc[0]+","+loc[1]+","+loc[2]);
+		}
+		this.getConfig().set("worlds."+player.getWorld().toString()+".spawns", spawnString);
+		try {
+			this.getConfig().save("config.yml");
+		} catch(IOException e) {
+			this.getLogger().severe("Could not write config section" + e.toString());
+		}
+	}
 	@EventHandler
 	public void onPlayerQuit(PlayerQuitEvent evt) {
 		// Make sure players are not registered for events that haven't fired
@@ -224,6 +250,15 @@ public class SimpleSurvival extends JavaPlugin {
 			}
 		} else if(cmdName.equalsIgnoreCase("endall")) {
 			endAllGames();
+			return true;
+		} else if(cmdName.equalsIgnoreCase("addspawn")) {
+			addSpawn((Player)sender);
+			return true;
+		} else if(cmdName.equalsIgnoreCase("dumpspawns")) {
+			dumpSpawns((Player)sender);
+			return true;
+		} else if(cmdName.equalsIgnoreCase("clearspawns")) {
+			spawns = new ArrayList<>();
 			return true;
 		}
 		//if we've made it here no command handler could fire

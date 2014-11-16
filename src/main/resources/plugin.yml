@@ -3,24 +3,38 @@ main: net.SimpleSurvival.SimpleSurvival
 version: 0.1-SNAPSHOT
 
 permissions:
-  gamemaster.*:
+  SS.*:
     description: The admin of the survival game.
     default: op
-
+  SS.player:
+    description: The player of the game.
+    default: true
 commands:
   survival:
     description: register or unregister from a game
     usage: "Usage: /survival <register|unregister> <gameID>"
-    permission: gamemaster
+    permission: SS.player
   warp:
     description: manually warp players to a game
     usage: "Usage: /warp <game>"
-    permission: gamemaster
+    permission: SS.gamemaster
   start:
     description: manually start a game
     usage: "Usage: /start <game>"
-    permission: gamemaster
+    permission: SS.gamemaster
   endall:
-    description: end all games, queued and running"
+    description: end all games, queued and running
     usage: "Usage: /endall"
-    permission: gamemaster
+    permission: SS.gamemaster
+  addspawn:
+    description: add a spawn to the temp list
+    usage: "Usage: /addspawn"
+    permission: SS.gamemaster
+  dumpspawns:
+    description: print all stored spawns
+    usage: "Usage /dumpspawns"
+    permission: SS.gamemaster
+  clearspawns:
+    description: clear temp spawn list
+    usage: "Usage /clearspawns"
+    permission: SS.gamemaster

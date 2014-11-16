@@ -97,10 +97,22 @@ public class GameManager implements Listener {
             state = GameState.STARTING;
         }
     }
-    public void end() {
-        BukkitTask countDownTimer = new GameEnder(this.plugin, this, 10).runTaskTimer(this.plugin, 0, 20);
-    }
+    public void end(boolean silent) {
+        if (silent) {
+            for (Player p : Bukkit.getWorld(worldUUID).getPlayers()) {
+                p.sendMessage("This world is being unloaded");
+            }
 
+            for(Player p : Bukkit.getWorld(worldUUID).getPlayers()) {
+                p.teleport(Bukkit.getServer().getWorlds().get(0).getSpawnLocation());
+            }
+
+            plugin.worldManager.destroyWorld(worldUUID);
+            unregisterListeners();
+        } else {
+            BukkitTask countDownTimer = new GameEnder(this.plugin, this, 10).runTaskTimer(this.plugin, 0, 20);
+        }
+    }
     public void announceWinner() {
         for(Player p: Bukkit.getWorld(worldUUID).getPlayers()) {
             if(competitors.size()>0) {
