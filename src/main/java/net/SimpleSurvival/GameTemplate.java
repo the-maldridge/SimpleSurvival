@@ -21,6 +21,9 @@ public class GameTemplate {
     private  List<Integer[]> spawns;
     private  HashMap<Material, Double> loot;
     private  List<Material> breakables;
+    private boolean allowHostileMobs;
+    private boolean allowAnimals;
+
 
 
     public GameTemplate(SimpleSurvival plugin, String sourceWorld, String displayName) {
@@ -56,6 +59,9 @@ public class GameTemplate {
         for(String breakable: breakableNames) {
             breakables.add(Material.getMaterial(breakable));
         }
+
+        allowHostileMobs = plugin.getConfig().getBoolean("worlds." + sourceWorld + ".mobs");
+        allowAnimals = plugin.getConfig().getBoolean("worlds." + sourceWorld + ".animals");
     }
     public GameManager createGame(SimpleSurvival plugin) {
         // Spins off a new GameSettings from GameTemplate to represent a running game
@@ -73,6 +79,8 @@ public class GameTemplate {
     public boolean isFull() {
         return competitors.size()>=maxPlayers;
     }
+    public boolean doHostileMobs() { return allowHostileMobs; }
+    public boolean doAnimals() { return allowAnimals; }
 
     public List<Integer[]> getSpawns() {
         return spawns;

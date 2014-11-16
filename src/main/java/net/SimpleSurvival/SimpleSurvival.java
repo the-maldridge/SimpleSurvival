@@ -53,9 +53,7 @@ public class SimpleSurvival extends JavaPlugin {
 						// Get the settings for the world
 						GameManager manager = game.createGame(this.plugin);
 						// Copy the world data into the running worlds
-						this.plugin.worldManager.newWorldFromTemplate(manager.getWorld(), manager.getWorldUUID());
-						// Load the world into memory
-						this.plugin.getServer().createWorld(new WorldCreator(manager.getWorldUUID()));
+						this.plugin.worldManager.newWorldFromTemplate(manager);
 						// Send the players there
 						manager.sendPlayersToSpawn();
 						// Add the world to the running games

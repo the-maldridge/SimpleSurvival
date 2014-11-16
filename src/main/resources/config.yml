@@ -7,3 +7,5 @@ worlds:
           - 13,66,22
         loot:
           - STONE_SWORD: 100.0
+        allowMobs: false
+        allowAnimals: false

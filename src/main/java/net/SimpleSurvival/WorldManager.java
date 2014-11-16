@@ -2,6 +2,7 @@ package net.SimpleSurvival;
 
 
 import org.bukkit.Bukkit;
+import org.bukkit.WorldCreator;
 
 import java.io.*;
 import java.nio.file.*;
@@ -17,16 +18,22 @@ public class WorldManager {
         this.plugin = plugin;
     }
 
-    public void newWorldFromTemplate(String template, String newName) {
+    public void newWorldFromTemplate(GameManager manager) {
+        String template = manager.getWorld();
+        String newName = manager.getWorldUUID();
         boolean errors = false;
+
         try {
             System.out.println(this.plugin.getDataFolder().getCanonicalPath() + ":" + template);
             Path source = Paths.get(this.plugin.getDataFolder().getCanonicalPath(), template);
             Files.walkFileTree(source, new CopyFileVisitor(source, Paths.get(Bukkit.getWorldContainer().getCanonicalPath(), newName)));
+            this.plugin.getServer().createWorld(new WorldCreator(manager.getWorldUUID()));
         } catch (IOException e) {
             this.plugin.getLogger().severe("Could not load world " + template);
             this.plugin.getLogger().severe(e.toString());
         }
+        this.plugin.getServer().getWorld(manager.getWorldUUID()).setPVP(true);
+        this.plugin.getServer().getWorld(manager.getWorldUUID()).setSpawnFlags(manager.doHostileMobs(), manager.doAnimals());
     }
     public void destroyWorld(String worldToDestroy) {
         //unload the world without saving, we are about to delete it anyway

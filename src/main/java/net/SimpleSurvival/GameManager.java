@@ -71,6 +71,9 @@ public class GameManager implements Listener {
         return worldUUID;
     }
 
+    public boolean doAnimals() { return staticSettings.doAnimals(); }
+    public boolean doHostileMobs() { return staticSettings.doHostileMobs(); }
+
     public boolean sendPlayersToSpawn() {
         for (int i = 0; i < competitors.size(); i++) {
             int x = staticSettings.getSpawns().get(i)[0];
