@@ -183,6 +183,8 @@ public class GameManager implements Listener {
                 player.getInventory().remove(i);
             }
         }
+        player.getInventory().clear();
+        player.getInventory().setArmorContents(new ItemStack[] {null, null, null, null});
     }
 
     private void setSpectatorMode(String player) {
