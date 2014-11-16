@@ -28,7 +28,6 @@ public class WorldManager {
             this.plugin.getLogger().severe(e.toString());
         }
     }
-
     public void destroyWorld(String worldToDestroy) {
         //unload the world without saving, we are about to delete it anyway
         if(this.plugin.getServer().unloadWorld(worldToDestroy,false)) {
@@ -73,8 +72,6 @@ public class WorldManager {
             return FileVisitResult.CONTINUE;
         }
     }
-
-
     private class CopyFileVisitor extends SimpleFileVisitor<Path> {
         private Path target;
         private Path source;

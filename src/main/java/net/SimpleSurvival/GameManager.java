@@ -100,6 +100,36 @@ public class GameManager implements Listener {
         BukkitTask countDownTimer = new GameEnder(this.plugin, this, 10).runTaskTimer(this.plugin, 0, 20);
     }
 
+    private void dropPlayerInventory(Player player) {
+        for (ItemStack i : player.getInventory().getContents()) {
+            if (i != null) {
+                player.getWorld().dropItemNaturally(player.getLocation(), i);
+                player.getInventory().remove(i);
+            }
+        }
+        player.getInventory().clear();
+        player.getInventory().setArmorContents(new ItemStack[] {null, null, null, null});
+    }
+
+    private void setSpectatorMode(String player) {
+        Player p = Bukkit.getPlayer(player);
+        p.setGameMode(GameMode.ADVENTURE);
+        p.setAllowFlight(true);
+        p.setCanPickupItems(false);
+        for(Player pl : p.getWorld().getPlayers()) {
+            pl.hidePlayer(p);
+        }
+    }
+
+    public void unregisterListeners() {
+        PlayerMoveEvent.getHandlerList().unregister(this);
+        EntityDamageEvent.getHandlerList().unregister(this);
+        EntityDamageByEntityEvent.getHandlerList().unregister(this);
+        InventoryOpenEvent.getHandlerList().unregister(this);
+        BlockBreakEvent.getHandlerList().unregister(this);
+        PlayerPickupItemEvent.getHandlerList().unregister(this);
+    }
+
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
         if (event.getPlayer().getWorld().getName() == worldUUID) {
@@ -176,27 +206,6 @@ public class GameManager implements Listener {
         }
     }
 
-    private void dropPlayerInventory(Player player) {
-        for (ItemStack i : player.getInventory().getContents()) {
-            if (i != null) {
-                player.getWorld().dropItemNaturally(player.getLocation(), i);
-                player.getInventory().remove(i);
-            }
-        }
-        player.getInventory().clear();
-        player.getInventory().setArmorContents(new ItemStack[] {null, null, null, null});
-    }
-
-    private void setSpectatorMode(String player) {
-        Player p = Bukkit.getPlayer(player);
-        p.setGameMode(GameMode.ADVENTURE);
-        p.setAllowFlight(true);
-        p.setCanPickupItems(false);
-        for(Player pl : p.getWorld().getPlayers()) {
-            pl.hidePlayer(p);
-        }
-    }
-
     @EventHandler
     public void onChestOpen(InventoryOpenEvent inventoryOpenEvent) {
         if (inventoryOpenEvent.getPlayer().getWorld().getName() == worldUUID) {
@@ -234,15 +243,6 @@ public class GameManager implements Listener {
             event.setCancelled(true);
         }
     }
-
-	public void unregisterListeners() {
-		PlayerMoveEvent.getHandlerList().unregister(this);
-		EntityDamageEvent.getHandlerList().unregister(this);
-		EntityDamageByEntityEvent.getHandlerList().unregister(this);
-		InventoryOpenEvent.getHandlerList().unregister(this);
-        BlockBreakEvent.getHandlerList().unregister(this);
-        PlayerPickupItemEvent.getHandlerList().unregister(this);
-	}
 }
 
 class GameStarter extends BukkitRunnable {

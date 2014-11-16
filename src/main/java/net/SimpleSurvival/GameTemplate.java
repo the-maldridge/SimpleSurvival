@@ -15,39 +15,13 @@ import java.util.*;
 public class GameTemplate {
     private int minPlayers=1;
     private int maxPlayers;
-
-    public boolean isReady() {
-        return competitors.size()>=minPlayers;
-    }
-
-    public boolean isFull() {
-        return competitors.size()>=maxPlayers;
-    }
-
-    public List<Integer[]> getSpawns() {
-        return spawns;
-    }
-
-    public HashMap<Material, Double> getLoot() {
-        return loot;
-    }
-
-    public List<Material> getBreakables() {
-        return breakables;
-    }
-
+    private ArrayList<String> competitors = new ArrayList<>();
+    private String sourceWorld;
+    private String displayName;
     private  List<Integer[]> spawns;
     private  HashMap<Material, Double> loot;
     private  List<Material> breakables;
 
-    // The people 'lined up' for this game
-    private ArrayList<String> competitors = new ArrayList<>();
-
-    // The name of the 'backup' world that this world is going to be initialized from
-    private String sourceWorld;
-
-    // The display name of this template, e.g. 'castles' or somesuch
-    private String displayName;
 
     public GameTemplate(SimpleSurvival plugin, String sourceWorld, String displayName) {
         this.sourceWorld = sourceWorld;
@@ -71,10 +45,10 @@ public class GameTemplate {
         List<Map<?, ?>> lootMaps = (List<Map<?, ?>>)plugin.getConfig().getMapList("worlds." + sourceWorld + ".loot");
         this.loot = new HashMap<>();
         for(Map<?, ?> map: lootMaps) {
-			for(Object key: map.keySet()) {
-				plugin.getLogger().fine("Loading loot for " + sourceWorld + ": " + (String)key);
-				this.loot.put(Material.getMaterial((String)key), (Double)map.get(key));
-			}
+            for(Object key: map.keySet()) {
+                plugin.getLogger().fine("Loading loot for " + sourceWorld + ": " + (String)key);
+                this.loot.put(Material.getMaterial((String)key), (Double)map.get(key));
+            }
         }
 
         List<String> breakableNames = plugin.getConfig().getStringList("worlds." + sourceWorld + ".breakables");
@@ -83,13 +57,34 @@ public class GameTemplate {
             breakables.add(Material.getMaterial(breakable));
         }
     }
-
-    public String getSourceWorld() {
-        return sourceWorld;
+    public GameManager createGame(SimpleSurvival plugin) {
+        // Spins off a new GameSettings from GameTemplate to represent a running game
+        GameManager val = new GameManager(plugin, this, competitors);
+        for(String p: competitors) {
+            Bukkit.getPlayer(p).sendMessage("The game is about to begin");
+        }
+        this.competitors = new ArrayList<>();
+        return val;
     }
 
-    public String getDisplayName() {
-        return displayName;
+    public boolean isReady() {
+        return competitors.size()>=minPlayers;
+    }
+    public boolean isFull() {
+        return competitors.size()>=maxPlayers;
+    }
+
+    public List<Integer[]> getSpawns() {
+        return spawns;
+    }
+    public HashMap<Material, Double> getLoot() {
+        return loot;
+    }
+    public List<Material> getBreakables() {
+        return breakables;
+    }
+    public String getSourceWorld() {
+        return sourceWorld;
     }
 
     public void addCompetitor(String competitor) {
@@ -101,15 +96,5 @@ public class GameTemplate {
     }
     public void removeCompetitor(String competitor) {
         competitors.remove(competitor);
-    }
-
-    public GameManager createGame(SimpleSurvival plugin) {
-        // Spins off a new GameSettings from GameTemplate to represent a running game
-        GameManager val = new GameManager(plugin, this, competitors);
-        for(String p: competitors) {
-            Bukkit.getPlayer(p).sendMessage("The game is about to begin");
-        }
-        this.competitors = new ArrayList<>();
-        return val;
     }
 }

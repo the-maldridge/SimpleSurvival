@@ -40,6 +40,38 @@ public class SimpleSurvival extends JavaPlugin {
         }
     }
 
+	@Override
+	public void onEnable() {
+		this.saveDefaultConfig();
+		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
+		scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
+			SimpleSurvival plugin = SimpleSurvival.this;
+			@Override
+			public void run() {
+				for(GameTemplate game : this.plugin.gameTemplates.values()) {
+					if(game.isReady()) {
+						// Get the settings for the world
+						GameManager manager = game.createGame(this.plugin);
+						// Copy the world data into the running worlds
+						this.plugin.worldManager.newWorldFromTemplate(manager.getWorld(), manager.getWorldUUID());
+						// Load the world into memory
+						this.plugin.getServer().createWorld(new WorldCreator(manager.getWorldUUID()));
+						// Send the players there
+						manager.sendPlayersToSpawn();
+						// Add the world to the running games
+						this.plugin.runningGames.add(manager);
+					}
+				}
+
+				for(int i=0; i<this.plugin.runningGames.size(); i++) {
+					if(this.plugin.runningGames.get(i).getState() == GameManager.GameState.FINISHED) {
+						this.plugin.runningGames.remove(i--).end();
+					}
+				}
+			}
+		}, 0L, 200L);
+	}
+
 	@EventHandler
 	public void onPlayerQuit(PlayerQuitEvent evt) {
 		// Make sure players are not registered for events that haven't fired
@@ -51,38 +83,6 @@ public class SimpleSurvival extends JavaPlugin {
 			}
 		}
 	}
-
-    public void onEnable() {
-        this.saveDefaultConfig();
-        BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-        scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
-            SimpleSurvival plugin = SimpleSurvival.this;
-            @Override
-            public void run() {
-                for(GameTemplate game : this.plugin.gameTemplates.values()) {
-                    if(game.isReady()) {
-                        // Get the settings for the world
-                        GameManager manager = game.createGame(this.plugin);
-                        // Copy the world data into the running worlds
-                        this.plugin.worldManager.newWorldFromTemplate(manager.getWorld(), manager.getWorldUUID());
-                        // Load the world into memory
-                        this.plugin.getServer().createWorld(new WorldCreator(manager.getWorldUUID()));
-                        // Send the players there
-                        manager.sendPlayersToSpawn();
-                        // Add the world to the running games
-                        this.plugin.runningGames.add(manager);
-                    }
-                }
-
-                for(int i=0; i<this.plugin.runningGames.size(); i++) {
-                    if(this.plugin.runningGames.get(i).getState() == GameManager.GameState.FINISHED) {
-                        this.plugin.runningGames.remove(i--).end();
-                    }
-                }
-            }
-        }, 0L, 200L);
-    }
-
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
