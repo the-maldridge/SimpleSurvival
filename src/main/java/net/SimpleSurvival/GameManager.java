@@ -80,9 +80,9 @@ public class GameManager implements Listener {
 
     public void sendPlayersToSpawn() {
         for (int i = 0; i < competitors.size(); i=i+(int)Math.floor((staticSettings.getSpawns().size()/competitors.size()))) {
-            double x = staticSettings.getSpawns().get(i)[0]+0.5;
-            double y = staticSettings.getSpawns().get(i)[1]+0.5;
-            double z = staticSettings.getSpawns().get(i)[2]+0.5;
+            int x = staticSettings.getSpawns().get(i)[0];
+            int y = staticSettings.getSpawns().get(i)[1];
+            int z = staticSettings.getSpawns().get(i)[2];
             World w = Bukkit.getWorld(worldUUID);
             Location nextSpawn = new Location(w, x, y, z);
             Player player = Bukkit.getPlayer(competitors.get(i));
@@ -198,7 +198,7 @@ public class GameManager implements Listener {
                             setSpectatorMode(victim.getName());
                             dropPlayerInventory(victim);
                             for (Player pl : Bukkit.getWorld(worldUUID).getPlayers()) {
-                                pl.sendMessage(ChatColor.RED + "[DEATH]" + ChatColor.BOLD + victim.getName() + " was killed by " + ChatColor.BOLD + killer.getName());
+                                pl.sendMessage(ChatColor.RED + "[DEATH]" + ChatColor.BOLD + victim.getName() + ChatColor.RESET + " was killed by " + ChatColor.BOLD + killer.getName());
                             }
                             //if there is only one competitor left, set the game state to finished
                             if (competitors.size() <= 1) {
@@ -230,7 +230,7 @@ public class GameManager implements Listener {
                         dropPlayerInventory(victim);
                         setSpectatorMode(victim.getName());
                         for (Player pl : Bukkit.getWorld(worldUUID).getPlayers()) {
-                            pl.sendMessage(ChatColor.RED + "[DEATH]" + ChatColor.BOLD + victim.getName() + " was killed by " + ChatColor.BOLD + event.getCause().toString());
+                            pl.sendMessage(ChatColor.RED + "[DEATH] " + ChatColor.BOLD + victim.getName() + ChatColor.RESET + " was killed by " + ChatColor.BOLD + event.getCause().toString());
                         }
                         //if there is only one competitor left, set the game state to finished
                         if (competitors.size() <= 1) {
