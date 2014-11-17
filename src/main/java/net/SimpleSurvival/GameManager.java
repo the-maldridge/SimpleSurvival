@@ -192,24 +192,13 @@ public class GameManager implements Listener {
                         Player victim = ((Player) event.getEntity()).getPlayer();
                         Player killer = ((Player) event.getDamager()).getPlayer();
                         if (victim.getHealth() - event.getDamage() <= 0) {
-                            //Player is dead
                             event.setCancelled(true);
-                            competitors.remove(competitors.indexOf(victim.getName()));
-                            setSpectatorMode(victim.getName());
-                            dropPlayerInventory(victim);
-                            for (Player pl : Bukkit.getWorld(worldUUID).getPlayers()) {
-                                pl.sendMessage(ChatColor.RED + "[DEATH]" + ChatColor.BOLD + victim.getName() + ChatColor.RESET + " was killed by " + ChatColor.BOLD + killer.getName());
-                            }
-                            //if there is only one competitor left, set the game state to finished
-                            if (competitors.size() <= 1) {
-                                announceWinner();
-                                state = GameState.FINISHED;
-                            }
+                            playerKilled(victim, killer);
                         }
 
                     } else {
-						event.setCancelled(true);
-					}
+                        event.setCancelled(true);
+                    }
                 } else {
                     event.setCancelled(true);
                 }
@@ -280,6 +269,21 @@ public class GameManager implements Listener {
             event.setCancelled(true);
         }
     }
+
+    private void playerKilled(Player victim, Player killer) {
+        //Player is dead
+        competitors.remove(competitors.indexOf(victim.getName()));
+        setSpectatorMode(victim.getName());
+        dropPlayerInventory(victim);
+        for (Player pl : Bukkit.getWorld(worldUUID).getPlayers()) {
+            pl.sendMessage(ChatColor.RED + "[DEATH]" + ChatColor.BOLD + victim.getName() + ChatColor.RESET + " was killed by " + ChatColor.BOLD + killer.getName());
+        }
+        //if there is only one competitor left, set the game state to finished
+        if (competitors.size() <= 1) {
+            announceWinner();
+            state = GameState.FINISHED;
+        }
+    }
 }
 
 class GameStarter extends BukkitRunnable {
@@ -347,7 +351,7 @@ class GameEnder extends BukkitRunnable {
             }
 
             plugin.worldManager.destroyWorld(currentGame.getWorldUUID());
-			currentGame.unregisterListeners();
+            currentGame.unregisterListeners();
             this.cancel();
         }
 
