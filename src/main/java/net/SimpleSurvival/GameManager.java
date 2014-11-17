@@ -4,6 +4,7 @@ import org.bukkit.*;
 import org.bukkit.block.Chest;
 import org.bukkit.block.DoubleChest;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -191,6 +192,14 @@ public class GameManager implements Listener {
                         //damage caused by PvP
                         Player victim = ((Player) event.getEntity()).getPlayer();
                         Player killer = ((Player) event.getDamager()).getPlayer();
+                        if (victim.getHealth() - event.getDamage() <= 0) {
+                            event.setCancelled(true);
+                            playerKilled(victim, killer);
+                        }
+
+                    } else if (event.getDamager() instanceof Projectile) {
+                        Player victim = ((Player) event.getEntity()).getPlayer();
+                        Player killer = (Player) (((Projectile) event.getDamager()).getShooter());
                         if (victim.getHealth() - event.getDamage() <= 0) {
                             event.setCancelled(true);
                             playerKilled(victim, killer);
