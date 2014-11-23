@@ -4,6 +4,7 @@ import org.bukkit.*;
 import org.bukkit.block.Chest;
 import org.bukkit.block.DoubleChest;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -195,19 +196,16 @@ public class GameManager implements Listener {
                             event.setCancelled(true);
                         }
                         if (victim.getHealth() - event.getDamage() <= 0) {
-                            //Player is dead
                             event.setCancelled(true);
-                            competitors.remove(competitors.indexOf(victim.getName()));
-                            setSpectatorMode(victim.getName());
-                            dropPlayerInventory(victim);
-                            for (Player pl : Bukkit.getWorld(worldUUID).getPlayers()) {
-                                pl.sendMessage(ChatColor.RED + "[DEATH]" + ChatColor.BOLD + victim.getName() + ChatColor.RESET + " was killed by " + ChatColor.BOLD + killer.getName());
-                            }
-                            //if there is only one competitor left, set the game state to finished
-                            if (competitors.size() <= 1) {
-                                announceWinner();
-                                state = GameState.FINISHED;
-                            }
+                            playerKilled(victim, killer);
+                        }
+
+                    } else if (event.getDamager() instanceof Projectile) {
+                        Player victim = ((Player) event.getEntity()).getPlayer();
+                        Player killer = (Player) (((Projectile) event.getDamager()).getShooter());
+                        if (victim.getHealth() - event.getDamage() <= 0) {
+                            event.setCancelled(true);
+                            playerKilled(victim, killer);
                         }
 
                     } else {
@@ -281,6 +279,21 @@ public class GameManager implements Listener {
     public void onItemPickup(PlayerPickupItemEvent event) {
         if(!competitors.contains(event.getPlayer().getName())) {
             event.setCancelled(true);
+        }
+    }
+
+    private void playerKilled(Player victim, Player killer) {
+        //Player is dead
+        competitors.remove(competitors.indexOf(victim.getName()));
+        setSpectatorMode(victim.getName());
+        dropPlayerInventory(victim);
+        for (Player pl : Bukkit.getWorld(worldUUID).getPlayers()) {
+            pl.sendMessage(ChatColor.RED + "[DEATH]" + ChatColor.BOLD + victim.getName() + ChatColor.RESET + " was killed by " + ChatColor.BOLD + killer.getName());
+        }
+        //if there is only one competitor left, set the game state to finished
+        if (competitors.size() <= 1) {
+            announceWinner();
+            state = GameState.FINISHED;
         }
     }
 }
