@@ -186,11 +186,14 @@ public class GameManager implements Listener {
     public void onPlayerDamage(EntityDamageByEntityEvent event) {
         if (event.getEntity().getWorld().getName() == worldUUID) {
             if ((event.getEntity() instanceof Player)) {
-                if(competitors.contains(((Player)event.getEntity()).getPlayer().getName())) {
+                if (competitors.contains(((Player) event.getEntity()).getPlayer().getName())) {
                     if ((event.getDamager() instanceof Player) && (competitors.contains(((Player) event.getDamager()).getName()))) {
                         //damage caused by PvP
                         Player victim = ((Player) event.getEntity()).getPlayer();
                         Player killer = ((Player) event.getDamager()).getPlayer();
+                        if(!competitors.contains(killer.getName())) {
+                            event.setCancelled(true);
+                        }
                         if (victim.getHealth() - event.getDamage() <= 0) {
                             //Player is dead
                             event.setCancelled(true);
@@ -208,8 +211,8 @@ public class GameManager implements Listener {
                         }
 
                     } else {
-						event.setCancelled(true);
-					}
+                        event.setCancelled(true);
+                    }
                 } else {
                     event.setCancelled(true);
                 }
@@ -347,7 +350,7 @@ class GameEnder extends BukkitRunnable {
             }
 
             plugin.worldManager.destroyWorld(currentGame.getWorldUUID());
-			currentGame.unregisterListeners();
+            currentGame.unregisterListeners();
             this.cancel();
         }
 
