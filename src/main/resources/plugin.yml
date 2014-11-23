@@ -1,6 +1,8 @@
 name: SimpleSurvival
 main: net.SimpleSurvival.SimpleSurvival
 version: 0.1-SNAPSHOT
+author: maldridge
+authors: [justanull, geppettodivacin, ibrown]
 
 permissions:
   SS.*:
