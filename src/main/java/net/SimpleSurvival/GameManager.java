@@ -28,9 +28,9 @@ import java.util.*;
  */
 public class GameManager implements Listener {
     private final String worldUUID = UUID.randomUUID().toString();
+
     private final SimpleSurvival plugin;
     ArrayList<String> spectators = new ArrayList<String>();
-    public enum GameState {BEFORE_GAME, STARTING, RUNNING, PAUSED, FINISHED}
     private GameState state = GameState.BEFORE_GAME;
     private ArrayList<InventoryHolder> openedChests = new ArrayList<InventoryHolder>();
     private GameTemplate staticSettings;
@@ -40,12 +40,16 @@ public class GameManager implements Listener {
         this.plugin = plugin;
         this.staticSettings = staticSettings;
         this.competitors = competitors;
-        this.plugin.getLogger().info("Warping the following players to  " + this.staticSettings.getSourceWorld() + ": "+ competitors.toString());
+        this.plugin.getLogger().info("Warping the following players to  " + this.staticSettings.getSourceWorld() + ": " + competitors.toString());
         this.plugin.getServer().getPluginManager().registerEvents(this, this.plugin);
     }
 
     public ArrayList<String> getCompetitors() {
         return competitors;
+    }
+
+    public boolean isCompetitor(String name) {
+        return competitors.contains(name);
     }
 
     public List<Integer[]> getSpawns() {
@@ -65,7 +69,10 @@ public class GameManager implements Listener {
     }
 
     @Override
-    public String toString() {return this.getWorld()+"-"+this.getWorldUUID().substring(0,4);}
+    public String toString() {
+        return this.getWorld() + "-" + this.getWorldUUID().substring(0, 6);
+    }
+
     public String getWorld() {
         return staticSettings.getSourceWorld();
     }
@@ -74,10 +81,21 @@ public class GameManager implements Listener {
         return worldUUID;
     }
 
-    public boolean doAnimals() { return staticSettings.doAnimals(); }
-    public boolean doHostileMobs() { return staticSettings.doHostileMobs(); }
-    public boolean doAutoWarp() { return staticSettings.doAutoWarp(); }
-    public boolean doAutoStart() { return staticSettings.doAutoStart(); }
+    public boolean doAnimals() {
+        return staticSettings.doAnimals();
+    }
+
+    public boolean doHostileMobs() {
+        return staticSettings.doHostileMobs();
+    }
+
+    public boolean doAutoWarp() {
+        return staticSettings.doAutoWarp();
+    }
+
+    public boolean doAutoStart() {
+        return staticSettings.doAutoStart();
+    }
 
     public void sendPlayersToSpawn() {
         for (int i = 0; i < competitors.size(); i++) {
@@ -93,18 +111,21 @@ public class GameManager implements Listener {
     }
 
     public void start() {
-        if(state == GameState.BEFORE_GAME) {
+        if (state == GameState.BEFORE_GAME) {
             new GameStarter(this.plugin, this, 15).runTaskTimer(this.plugin, 0, 20);
             state = GameState.STARTING;
+        } else {
+            this.plugin.getLogger().warning("start() was called on a game that wasn't in BEFORE_GAME");
         }
     }
+
     public void end(boolean silent) {
         if (silent) {
             for (Player p : Bukkit.getWorld(worldUUID).getPlayers()) {
                 p.sendMessage("This world is being unloaded");
             }
 
-            for(Player p : Bukkit.getWorld(worldUUID).getPlayers()) {
+            for (Player p : Bukkit.getWorld(worldUUID).getPlayers()) {
                 p.teleport(Bukkit.getServer().getWorlds().get(0).getSpawnLocation());
             }
 
@@ -114,19 +135,20 @@ public class GameManager implements Listener {
             BukkitTask countDownTimer = new GameEnder(this.plugin, this, 10).runTaskTimer(this.plugin, 0, 20);
         }
     }
+
     public void announceWinner() {
-        for(Player p: Bukkit.getWorld(worldUUID).getPlayers()) {
-            if(competitors.size()>0) {
+        for (Player p : Bukkit.getWorld(worldUUID).getPlayers()) {
+            if (competitors.size() == 1) {
                 p.sendMessage(competitors.get(0) + " has won the round!");
             }
         }
-        if(competitors.size()>0) {
+
+        if (competitors.size() == 1) {
             this.plugin.getLogger().info(competitors.get(0) + " has won the round.");
         } else {
-            this.plugin.getLogger().info("A serious error has occurred, winners list of size 0: " + competitors.toString());
+            this.plugin.getLogger().info("A serious error has occurred, winners list of size " + competitors.size() + ": " + competitors.toString());
         }
     }
-
 
     private void dropPlayerInventory(Player player) {
         for (ItemStack i : player.getInventory().getContents()) {
@@ -136,7 +158,8 @@ public class GameManager implements Listener {
             }
         }
         player.getInventory().clear();
-        player.getInventory().setArmorContents(new ItemStack[] {null, null, null, null});
+        // Whoever wrote this, why specifically 4 nulls? Is this some Bukkit internal thing?
+        player.getInventory().setArmorContents(new ItemStack[]{null, null, null, null});
     }
 
     private void setSpectatorMode(String player) {
@@ -144,10 +167,11 @@ public class GameManager implements Listener {
         p.setGameMode(GameMode.ADVENTURE);
         p.setAllowFlight(true);
         p.setCanPickupItems(false);
-        for(Player pl : p.getWorld().getPlayers()) {
+        for (Player pl : p.getWorld().getPlayers()) {
             pl.hidePlayer(p);
         }
     }
+
     private void setCompetitorMode(Player player) {
         player.setAllowFlight(false);
         player.setGameMode(GameMode.SURVIVAL);
@@ -168,14 +192,15 @@ public class GameManager implements Listener {
 
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
-        if (event.getPlayer().getWorld().getName() == worldUUID) {
-            if (competitors.contains(event.getPlayer().getName())) {
+        Player ply = event.getPlayer();
+        String plyName = ply.getName();
+        if (ply.getWorld().getName().equals(worldUUID)) {
+            if (isCompetitor(plyName)) {
                 if (state != GameState.RUNNING) {
                     Vector to = event.getTo().toVector();
                     Vector from = event.getFrom().toVector();
-                    Player player = event.getPlayer();
                     if (to.getX() != from.getX() || to.getZ() != from.getZ()) {
-                        player.teleport(event.getFrom());
+                        ply.teleport(event.getFrom());
                         event.setCancelled(true);
                     }
                 }
@@ -185,29 +210,29 @@ public class GameManager implements Listener {
 
     @EventHandler
     public void onPlayerDamage(EntityDamageByEntityEvent event) {
-        if (event.getEntity().getWorld().getName() == worldUUID) {
+        if (event.getEntity().getWorld().getName().equals(worldUUID)) {
             if ((event.getEntity() instanceof Player)) {
-                if (competitors.contains(((Player) event.getEntity()).getPlayer().getName())) {
-                    if ((event.getDamager() instanceof Player) && (competitors.contains(((Player) event.getDamager()).getName()))) {
-                        //damage caused by PvP
-                        Player victim = ((Player) event.getEntity()).getPlayer();
-                        Player killer = ((Player) event.getDamager()).getPlayer();
-                        if(!competitors.contains(killer.getName())) {
-                            event.setCancelled(true);
-                        }
-                        if (victim.getHealth() - event.getDamage() <= 0) {
-                            event.setCancelled(true);
-                            playerKilled(victim, killer);
-                        }
+                Player ply = (Player) event.getEntity();
+                String plyName = ply.getName();
 
-                    } else if (event.getDamager() instanceof Projectile) {
-                        Player victim = ((Player) event.getEntity()).getPlayer();
-                        Player killer = (Player) (((Projectile) event.getDamager()).getShooter());
-                        if (victim.getHealth() - event.getDamage() <= 0) {
-                            event.setCancelled(true);
-                            playerKilled(victim, killer);
-                        }
+                if (isCompetitor(plyName)) {
+                    Player killer;
 
+                    if (event.getDamager() instanceof Player) {
+                        killer = (Player) event.getDamager();
+                    } else if (event.getDamager() instanceof Projectile && ((Projectile) event.getDamager()).getShooter() instanceof Player) {
+                        killer = (Player) ((Projectile) event.getDamager()).getShooter();
+                    } else {
+                        event.setCancelled(true);
+                        return;
+                    }
+
+                    String killerName = killer.getName();
+                    if (isCompetitor(killerName)) {
+                        if (ply.getHealth() - event.getDamage() <= 0) {
+                            event.setCancelled(true);
+                            playerKilled(ply, killer);
+                        }
                     } else {
                         event.setCancelled(true);
                     }
@@ -220,19 +245,23 @@ public class GameManager implements Listener {
 
     @EventHandler
     public void onPlayerDamage(EntityDamageEvent event) {
-        if (event.getEntity().getWorld().getName() == worldUUID) {
+        if (event.getEntity().getWorld().getName().equals(worldUUID)) {
             if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
                 if (event.getEntity() instanceof Player) {
-                    Player victim = ((Player) event.getEntity()).getPlayer();
-                    if (victim.getHealth() - event.getDamage() <= 0) {
+                    Player ply = ((Player) event.getEntity()).getPlayer();
+                    String plyName = ply.getName();
+                    if (isCompetitor(plyName) && ply.getHealth() - event.getDamage() <= 0) {
                         //Player is dead
                         event.setCancelled(true);
-                        competitors.remove(victim.getName());
-                        dropPlayerInventory(victim);
-                        setSpectatorMode(victim.getName());
+                        competitors.remove(plyName);
+
+                        dropPlayerInventory(ply);
+                        setSpectatorMode(plyName);
+
                         for (Player pl : Bukkit.getWorld(worldUUID).getPlayers()) {
-                            pl.sendMessage(ChatColor.RED + "[DEATH] " + ChatColor.BOLD + victim.getName() + ChatColor.RESET + " was killed by " + ChatColor.BOLD + event.getCause().toString());
+                            pl.sendMessage(ChatColor.RED + "[DEATH] " + ChatColor.BOLD + plyName + ChatColor.RESET + " was killed by " + ChatColor.BOLD + event.getCause().toString());
                         }
+
                         //if there is only one competitor left, set the game state to finished
                         if (competitors.size() <= 1) {
                             announceWinner();
@@ -246,16 +275,18 @@ public class GameManager implements Listener {
 
     @EventHandler
     public void onChestOpen(InventoryOpenEvent inventoryOpenEvent) {
-        if (inventoryOpenEvent.getPlayer().getWorld().getName() == worldUUID) {
+        if (inventoryOpenEvent.getPlayer().getWorld().getName().equals(worldUUID)) {
             String player = inventoryOpenEvent.getPlayer().getName();
+
+            if (spectators.contains(player)) {
+                inventoryOpenEvent.setCancelled(true);
+                return;
+            }
+
             Inventory inventory = inventoryOpenEvent.getInventory();
             InventoryHolder holder = inventory.getHolder();
-            if (holder instanceof Chest || holder instanceof DoubleChest) {
-                if (spectators.contains(player)) {
-                    inventoryOpenEvent.setCancelled(true);
-                    return;
-                }
 
+            if (holder instanceof Chest || holder instanceof DoubleChest) {
                 if (!openedChests.contains(holder)) {
                     openedChests.add(holder);
                     for (Map.Entry<Material, Double> lootEntry : staticSettings.getLoot().entrySet()) {
@@ -270,25 +301,26 @@ public class GameManager implements Listener {
 
     @EventHandler
     public void onBlockBreak(BlockBreakEvent breakEvent) {
-        if(!this.staticSettings.getBreakables().contains(breakEvent.getBlock())) {
+        if (!this.staticSettings.getBreakables().contains(breakEvent.getBlock().getType())) {
             breakEvent.setCancelled(true);
         }
     }
 
     @EventHandler
     public void onItemPickup(PlayerPickupItemEvent event) {
-        if(!competitors.contains(event.getPlayer().getName())) {
+        if (!isCompetitor(event.getPlayer().getName())) {
             event.setCancelled(true);
         }
     }
 
-    private void playerKilled(Player victim, Player killer) {
+    private void playerKilled(Player ply, Player killer) {
         //Player is dead
-        competitors.remove(competitors.indexOf(victim.getName()));
-        setSpectatorMode(victim.getName());
-        dropPlayerInventory(victim);
+        String plyName = ply.getName();
+        competitors.remove(plyName);
+        setSpectatorMode(plyName);
+        dropPlayerInventory(ply);
         for (Player pl : Bukkit.getWorld(worldUUID).getPlayers()) {
-            pl.sendMessage(ChatColor.RED + "[DEATH]" + ChatColor.BOLD + victim.getName() + ChatColor.RESET + " was killed by " + ChatColor.BOLD + killer.getName());
+            pl.sendMessage(ChatColor.RED + "[DEATH]" + ChatColor.BOLD + plyName + ChatColor.RESET + " was killed by " + ChatColor.BOLD + killer.getName());
         }
         //if there is only one competitor left, set the game state to finished
         if (competitors.size() <= 1) {
@@ -296,5 +328,7 @@ public class GameManager implements Listener {
             state = GameState.FINISHED;
         }
     }
+
+    public enum GameState {BEFORE_GAME, STARTING, RUNNING, PAUSED, FINISHED}
 }
 
