@@ -1,0 +1,11 @@
+worlds:
+    BreezeIsland:
+        minPlayers: 1
+        maxPlayers: 4
+        spawns:
+          - 13,66,20
+          - 13,66,22
+        loot:
+          - STONE_SWORD: 100.0
+        allowMobs: false
+        allowAnimals: false

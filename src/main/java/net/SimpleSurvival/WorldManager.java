@@ -1,7 +1,12 @@
 package net.SimpleSurvival;
 
 
+import org.bukkit.Bukkit;
+import org.bukkit.WorldCreator;
+
 import java.io.*;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
 
 /**
  * Created by maldridge on 11/8/14.
@@ -13,85 +18,96 @@ public class WorldManager {
         this.plugin = plugin;
     }
 
-    public void importWorlds() {
+    public void newWorldFromTemplate(GameManager manager) {
+        String template = manager.getWorld();
+        String newName = manager.getWorldUUID();
         boolean errors = false;
-        File backupDir = new File(this.plugin.getDataFolder(), "backups");
-        for(File source : backupDir.listFiles()) {
-            if(source.isDirectory()) {
-                File target = new File(this.plugin.getServer().getWorldContainer(), source.getName());
-                if(target.exists() && target.isDirectory()) { //delete the old world folder
-                    if(!delete(target)) {
-                        plugin.getLogger().severe("Failed to reset world \"" + source.getName() + "\" - could not delete old " +
-                                "world folder.");
-                        errors = true;
-                        continue;
-                    }
-                }
-                try {
-                    copyDir(source, target); //import the new world folder from the plugin's backup directory
-                } catch(IOException e) {
-                    e.printStackTrace();
-                    plugin.getLogger().severe("Failed to reset world \"" + source.getName() + "\" - could not import the " +
-                            "world from backup.");
-                    errors = true;
-                }
-                plugin.getLogger().info("Import of world \"" + source.getName() + "\" " + (errors ? "failed!" : "succeeded!"));
-                errors = false;
-            }
+
+        try {
+            System.out.println(this.plugin.getDataFolder().getCanonicalPath() + ":" + template);
+            Path source = Paths.get(this.plugin.getDataFolder().getCanonicalPath(), template);
+            Files.walkFileTree(source, new CopyFileVisitor(source, Paths.get(Bukkit.getWorldContainer().getCanonicalPath(), newName)));
+            this.plugin.getServer().createWorld(new WorldCreator(manager.getWorldUUID()));
+        } catch (IOException e) {
+            this.plugin.getLogger().severe("Could not load world " + template);
+            this.plugin.getLogger().severe(e.toString());
         }
+        this.plugin.getServer().getWorld(manager.getWorldUUID()).setPVP(true);
+        this.plugin.getServer().getWorld(manager.getWorldUUID()).setSpawnFlags(manager.doHostileMobs(), manager.doAnimals());
     }
-    public void deleteWorlds() {
-        boolean worldsListed = false;
-        for(String worldName : plugin.getConfig().getStringList("random-seed.worlds")) {
-            if(!worldsListed)
-                worldsListed = true;
-            File target = new File(plugin.getServer().getWorldContainer(), worldName);
-            if(!target.exists()) {
-                plugin.getLogger().severe("Could not load world \"" + worldName + "\" with a random seed: no such world " +
-                        "exists in the server directory!");
-                return;
-            }
-            if(target.isDirectory()) {
-                if(!delete(target)) {
-                    plugin.getLogger().severe("Failed to delete world \"" + worldName + "\", perhaps the folder is locked?");
-                    continue;
-                }
-                plugin.getLogger().info("Successfully loaded a random seed for world \"" + worldName + "\"!");
-            }
-        }
-        if(!worldsListed)
-            this.plugin.getLogger().warning("The random seed option is enabled but no worlds are listed to be deleted and " +
-                    "regenerated with random seeds.");
-    }
-    private boolean delete(File file) {
-        if(file.isDirectory())
-            for(File subfile : file.listFiles())
-                if(!delete(subfile))
-                    return false;
-        if(!file.delete())
-            return false;
-        return true;
-    }
-    private static void copyDir(File source, File target) throws IOException {
-        if(source.isDirectory()) {
-            if(!target.exists())
-                target.mkdir();
-            String files[] = source.list();
-            for(String file : files) {
-                File srcFile = new File(source, file);
-                File destFile = new File(target, file);
-                copyDir(srcFile, destFile);
-            }
+    public void destroyWorld(String worldToDestroy) {
+        //unload the world without saving, we are about to delete it anyway
+        if(this.plugin.getServer().unloadWorld(worldToDestroy,false)) {
+            this.plugin.getLogger().info("successfully unloaded world");
         } else {
-            InputStream in = new FileInputStream(source);
-            OutputStream out = new FileOutputStream(target);
-            byte[] buffer = new byte[1024];
-            int length;
-            //copy the file content in bytes
-            while((length = in.read(buffer)) > 0)
-                out.write(buffer, 0, length);
-            in.close();
-            out.close();
+            this.plugin.getLogger().severe("could not unload world");
+            this.plugin.getLogger().severe("the following players weren't removed from the world: " + Bukkit.getWorld(worldToDestroy).getEntities().toString());
+        }
+        try {
+            Path toDelete = Paths.get(this.plugin.getServer().getWorldContainer().getCanonicalPath(), worldToDestroy);
+            Files.walkFileTree(toDelete, new DeletingFileVisitor(toDelete));
+        } catch(IOException e) {
+            this.plugin.getLogger().severe("Could not destroy world " + worldToDestroy);
+            this.plugin.getLogger().severe(e.toString());
+        }
+    }
+
+
+    private class DeletingFileVisitor extends SimpleFileVisitor<Path>{
+        private Path toDelete;
+
+        public DeletingFileVisitor(Path toDelete) {
+            this.toDelete = toDelete;
+        }
+        @Override
+        public FileVisitResult visitFile(Path file, BasicFileAttributes attributes) throws IOException {
+            if(attributes.isRegularFile()){
+                Files.delete(file);
+            }
+            return FileVisitResult.CONTINUE;
+        }
+
+        @Override
+        public FileVisitResult postVisitDirectory(Path directory, IOException ioe) throws IOException {
+            Files.delete(directory);
+            return FileVisitResult.CONTINUE;
+        }
+
+        @Override
+        public FileVisitResult visitFileFailed(Path file, IOException ioe) throws IOException {
+            ioe.printStackTrace();
+            return FileVisitResult.CONTINUE;
+        }
+    }
+    private class CopyFileVisitor extends SimpleFileVisitor<Path> {
+        private Path target;
+        private Path source;
+
+        public CopyFileVisitor(Path source, Path target) {
+            this.source = source;
+            this.target = target;
+        }
+
+
+        @Override
+        public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+            Path targetdir = target.resolve(source.relativize(dir));
+            try {
+                Files.copy(dir, targetdir);
+            } catch (FileAlreadyExistsException e) {
+                if (!Files.isDirectory(targetdir))
+                    throw e;
+            }
+            return FileVisitResult.CONTINUE;
+        }
+
+        @Override
+        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+            System.out.println(file.toString());
+            if(!file.toString().endsWith("/uid.dat")) {
+                Files.copy(file, target.resolve(source.relativize(file)));
+            }
+            return FileVisitResult.CONTINUE;
         }
     }
 }
