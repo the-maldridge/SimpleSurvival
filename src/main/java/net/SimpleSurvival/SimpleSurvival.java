@@ -16,10 +16,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-// NOTE: It should be noticed that "settings to begin a game" and "settings for a currently running game"
-// should *probably* be split, so that GameSettings doesn't have to interact with relatively static and relatively
-// active data at the same time, so we can store an array of running games and an array of possible ways to run a game
-
 /**
  * Created by maldridge on 11/8/14.
  */
