@@ -188,7 +188,7 @@ public class SimpleSurvival extends JavaPlugin {
 				return true;
 			}
 
-			if(args[0].equalsIgnoreCase("unregister")) {
+			if (args[0].equalsIgnoreCase("unregister")) {
 				if (!game.hasCompetitor(player)) {
 					sender.sendMessage("You aren't registered for that game");
 					return true;
@@ -198,6 +198,31 @@ public class SimpleSurvival extends JavaPlugin {
 				sender.sendMessage("Successfully unregistered");
 				return true;
 			}
+		} else if(cmdName.equalsIgnoreCase("registerAll")) {
+			if(args.length !=2) {
+				return false;
+			}
+
+			String worldFrom = args[0];
+			String gameTo = args[1];
+
+			if(!gameTemplates.containsKey(gameTo)) {
+				sender.sendMessage("Could not find specified game.");
+				return true;
+			}
+
+			GameTemplate game = gameTemplates.get(gameTo);
+
+			for(Player player: getServer().getWorld(worldFrom).getPlayers()) {
+				if(!game.hasCompetitor(player.getName())) {
+					sender.sendMessage("Registered player: " + player.getDisplayName());
+					game.addCompetitor(player.getName());
+				} else {
+					sender.sendMessage("Player " + player.getDisplayName() + " was already registered.");
+				}
+			}
+			return true;
+
 		} else if (cmdName.equalsIgnoreCase("warp")) {
 			if (args.length == 0) {
 				sender.sendMessage("Warpable games: " + warpable.toString());

@@ -16,6 +16,10 @@ commands:
     description: register or unregister from a game
     usage: "Usage: /survival <register|unregister> <gameID>"
     permission: SS.player
+  registerAll:
+    description: registers all players to a game
+    usage: "Usage: /registerAll <fromWorld> <toGame>"
+    permission: SS.gamemaster
   warp:
     description: manually warp players to a game
     usage: "Usage: /warp <game>"
