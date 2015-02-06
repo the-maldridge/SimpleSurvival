@@ -319,7 +319,7 @@ public class GameManager implements Listener {
         setSpectatorMode(plyName);
         dropPlayerInventory(ply);
         for (Player pl : Bukkit.getWorld(worldUUID).getPlayers()) {
-            pl.sendMessage(ChatColor.RED + "[DEATH]" + ChatColor.BOLD + plyName + ChatColor.RESET + " was killed by " + ChatColor.BOLD + killer.getName());
+            pl.sendMessage(ChatColor.RED + "[DEATH] " + ChatColor.BOLD + plyName + ChatColor.RESET + " was killed by " + ChatColor.BOLD + killer.getName());
         }
         //if there is only one competitor left, set the game state to finished
         if (competitors.size() <= 1) {

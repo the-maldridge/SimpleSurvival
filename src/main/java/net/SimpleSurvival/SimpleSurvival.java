@@ -1,6 +1,7 @@
 package net.SimpleSurvival;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.WorldCreator;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerPickupItemEvent;
@@ -135,6 +136,14 @@ public class SimpleSurvival extends JavaPlugin {
 		for (GameTemplate game : gameTemplates.values()) {
 			if (game.hasCompetitor(player)) {
 				game.removeCompetitor(player);
+			}
+		}
+	}
+
+	public void status() {
+		for(GameManager game: runningGames) {
+			for(Player p : getServer().getWorld(game.getWorldUUID()).getPlayers()) {
+				p.sendMessage(ChatColor.BOLD +""+ ChatColor.GOLD + "[STATUS] " + ChatColor.RESET + "Players remaining: " + game.getCompetitors().size());
 			}
 		}
 	}
@@ -293,6 +302,9 @@ public class SimpleSurvival extends JavaPlugin {
 			return true;
 		} else if(cmdName.equalsIgnoreCase("clearspawns")) {
 			spawns = new ArrayList<>();
+			return true;
+		} else if(cmdName.equalsIgnoreCase("status")) {
+			status();
 			return true;
 		}
 		//if we've made it here no command handler could fire
