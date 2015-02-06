@@ -152,7 +152,8 @@ public class SimpleSurvival extends JavaPlugin {
 
 			// NOTE: Assumes that games do not have a space in the name
 			if (args.length != 2) {
-				return false;
+				sender.sendMessage(gameTemplates.keySet().toString());
+				return true;
 			}
 
 

@@ -111,4 +111,8 @@ public class GameTemplate {
     public void removeCompetitor(String competitor) {
         competitors.remove(competitor);
     }
+
+    public String toString() {
+        return sourceWorld;
+    }
 }
