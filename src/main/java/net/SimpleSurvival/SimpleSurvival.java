@@ -211,9 +211,15 @@ public class SimpleSurvival extends JavaPlugin {
 				return true;
 			}
 
-			GameTemplate game = gameTemplates.get(gameTo);
 
+			GameTemplate game = gameTemplates.get(gameTo);
 			for(Player player: getServer().getWorld(worldFrom).getPlayers()) {
+				for(String key: gameTemplates.keySet()) {
+					if(gameTemplates.get(key).hasCompetitor(player.getName())) {
+						gameTemplates.get(key).removeCompetitor(player.getName());
+						sender.sendMessage("Unregistered " + player.getDisplayName() + " from " + gameTemplates.get(key).toString());
+					}
+				}
 				if(!game.hasCompetitor(player.getName())) {
 					sender.sendMessage("Registered player: " + player.getDisplayName());
 					game.addCompetitor(player.getName());
