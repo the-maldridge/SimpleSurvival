@@ -277,7 +277,7 @@ public class GameManager implements Listener {
         if (inventoryOpenEvent.getPlayer().getWorld().getName().equals(worldUUID)) {
             String player = inventoryOpenEvent.getPlayer().getName();
 
-            if (spectators.contains(player)) {
+            if (spectators.contains(player) || !competitors.contains(player)) {
                 inventoryOpenEvent.setCancelled(true);
                 return;
             }
