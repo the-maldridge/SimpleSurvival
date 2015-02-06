@@ -178,6 +178,7 @@ public class GameManager implements Listener {
         player.setHealth(20);
         player.setLevel(0);
         player.getInventory().clear();
+        player.getInventory().setArmorContents(new ItemStack[]{null, null, null, null});
     }
 
     public void unregisterListeners() {
@@ -193,19 +194,18 @@ public class GameManager implements Listener {
     public void onPlayerMove(PlayerMoveEvent event) {
         Player ply = event.getPlayer();
         String plyName = ply.getName();
-        if (ply.getWorld().getName().equals(worldUUID)) {
-            if (isCompetitor(plyName)) {
-                if (state != GameState.RUNNING) {
-                    Vector to = event.getTo().toVector();
-                    Vector from = event.getFrom().toVector();
-                    if (to.getX() != from.getX() || to.getZ() != from.getZ()) {
-                        ply.teleport(event.getFrom());
-                        event.setCancelled(true);
-                    }
+        if (ply.getWorld().getName().equals(worldUUID))
+            if (state != GameState.RUNNING) {
+                Vector to = event.getTo().toVector();
+                Vector from = event.getFrom().toVector();
+                if (to.getX() != from.getX() || to.getZ() != from.getZ()) {
+                    ply.teleport(event.getFrom());
+                    event.setCancelled(true);
                 }
             }
-        }
     }
+
+
 
     @EventHandler
     public void onPlayerDamage(EntityDamageByEntityEvent event) {
