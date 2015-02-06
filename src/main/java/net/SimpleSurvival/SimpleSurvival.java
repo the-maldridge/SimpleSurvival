@@ -255,7 +255,7 @@ public class SimpleSurvival extends JavaPlugin {
 				sender.sendMessage("Startable games: " + startable.toString());
 			} else if (args.length == 1) {
 				for (GameManager game : startable) {
-					if ((game.getWorld()+"-"+game.getWorldUUID().substring(0,4)).equalsIgnoreCase(args[0])) {
+					if ((game.getWorld() + "-" + game.getWorldUUID().substring(0, 4)).equalsIgnoreCase(args[0])) {
 						game.start();
 						startable.remove(game);
 						runningGames.add(game);
@@ -263,6 +263,22 @@ public class SimpleSurvival extends JavaPlugin {
 					}
 				}
 				sender.sendMessage("The game you entered wasn't startable.");
+			} else {
+				return false;
+			}
+		} else if(cmdName.equalsIgnoreCase("deathmatch")) {
+			if(args.length == 0) {
+				for(GameManager game: runningGames) {
+					sender.sendMessage("World: " + game.getWorld().toString() +"-"+game.getWorldUUID().substring(0,4) + "; Players: " + game.getCompetitors().size());
+				}
+				return true;
+			} else if(args.length == 1) {
+				for(GameManager game : runningGames) {
+					if((game.getWorld()+"-"+game.getWorldUUID().substring(0,4)).equalsIgnoreCase(args[0])) {
+						game.sendPlayersToSpawn();
+					}
+				}
+				return true;
 			} else {
 				return false;
 			}

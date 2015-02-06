@@ -20,6 +20,10 @@ commands:
     description: registers all players to a game
     usage: "Usage: /registerAll <fromWorld> <toGame>"
     permission: SS.gamemaster
+  deathmatch:
+    description: starts a deathmatch
+    usage: "Usage: /deathmatch [world] (no parameters gives world status)"
+    permission: SS.gamemaster
   warp:
     description: manually warp players to a game
     usage: "Usage: /warp <game>"
