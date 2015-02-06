@@ -148,7 +148,6 @@ public class SimpleSurvival extends JavaPlugin {
 				sender.sendMessage("It is assumed that only Players may register for a game");
 				return true;
 			}
-
 			String player = ((Player) sender).getName();
 
 			// NOTE: Assumes that games do not have a space in the name
@@ -156,26 +155,15 @@ public class SimpleSurvival extends JavaPlugin {
 				return false;
 			}
 
-			boolean isRegistering;
-
-			if (args[0].equalsIgnoreCase("register")) {
-				isRegistering = true;
-			} else if (args[0].equalsIgnoreCase("unregister")) {
-				isRegistering = false;
-			} else {
-				return false;
-			}
 
 			String gameName = args[1];
-
 			if (!gameTemplates.containsKey(gameName)) {
 				sender.sendMessage("Could not find the game " + gameName);
 				return true;
 			}
 
 			GameTemplate game = gameTemplates.get(gameName);
-
-			if (isRegistering) {
+			if (args[0].equalsIgnoreCase("register")) {
 				if (game.hasCompetitor(player)) {
 					sender.sendMessage("You are already registered for that game");
 					return true;
@@ -197,7 +185,9 @@ public class SimpleSurvival extends JavaPlugin {
 				game.addCompetitor(player);
 				sender.sendMessage("Successfully registered");
 				return true;
-			} else {
+			}
+
+			if(args[0].equalsIgnoreCase("unregister")) {
 				if (!game.hasCompetitor(player)) {
 					sender.sendMessage("You aren't registered for that game");
 					return true;

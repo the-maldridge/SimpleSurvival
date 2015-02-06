@@ -16,7 +16,6 @@ import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
@@ -70,7 +69,7 @@ public class GameManager implements Listener {
 
     @Override
     public String toString() {
-        return this.getWorld() + "-" + this.getWorldUUID().substring(0, 6);
+        return this.getWorld() + "-" + this.getWorldUUID().substring(0,4);
     }
 
     public String getWorld() {
